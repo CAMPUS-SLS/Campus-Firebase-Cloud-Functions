@@ -1,0 +1,12 @@
+{
+  "name": "campus-firebase-cloud-functions",
+  "version": "1.0.0",
+  "description": "This repository provides a framework for building multi-tenant internal APIs using Firebase Cloud Functions. It enables each tenant to create and manage their own set of APIs while leveraging Firebase Authentication and Cloud Functions for secure, serverless execution.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
