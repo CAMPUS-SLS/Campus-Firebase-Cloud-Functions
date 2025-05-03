@@ -9,8 +9,11 @@
 // const rickRollHTTP = require('./triggers/http/rickRollCallable');
 
 
-const { registerApplicant } = require('./triggers/http/registerApplicant');
+//http
+const { registerApplicant } = require('./src/triggers/http/registerApplicant');
+
 exports.registerApplicant = registerApplicant;
+
 
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;

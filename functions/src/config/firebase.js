@@ -16,7 +16,8 @@ const function_region = 'asia-southeast1';
 // Initialize Services
 const auth = admin.auth();
 
-functionV2.setGlobalOptions({ function_region });
+functions_v2.setGlobalOptions({ region: function_region });
+
 
 module.exports = {
   admin,
