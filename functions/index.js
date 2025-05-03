@@ -5,15 +5,19 @@
  */
 
 // Import all your function modules
-const rickRollAuthTriggers = require('./triggers/auth/rickRollAuthTrigger');
-const rickRollHTTP = require('./triggers/http/rickRollCallable');
+// const rickRollAuthTriggers = require('./triggers/auth/rickRollAuthTrigger');
+// const rickRollHTTP = require('./triggers/http/rickRollCallable');
+
+
+const { registerApplicant } = require('./triggers/http/registerApplicant');
+exports.registerApplicant = registerApplicant;
 
 // Export Auth Triggers
-exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
-exports.logUserDeletedRickRoll = rickRollAuthTriggers.logUserDeletedRickRoll;
+// exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
+// exports.logUserDeletedRickRoll = rickRollAuthTriggers.logUserDeletedRickRoll;
 
 // Export HTTP Functions
-exports.rickRoll = rickRollHTTP.rickRoll;
+// exports.rickRoll = rickRollHTTP.rickRoll;
 
 // You can add more functions as you develop them
 // Example:
