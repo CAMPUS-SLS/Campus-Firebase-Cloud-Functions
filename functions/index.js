@@ -16,7 +16,8 @@ const { loginStudent } = require('./src/triggers/http/loginStudent');
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
-
+const { verifyStaff } = require("./src/triggers/http/verifyStaff");
+const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVerification");
 
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
@@ -31,6 +32,8 @@ exports.loginStudent = loginStudent;
 
 exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
+exports.verifyStaff = verifyStaff;
+exports.getAllStaffVerification = getAllStaffVerification;
 
 // You can add more functions as you develop them
 // Example:
