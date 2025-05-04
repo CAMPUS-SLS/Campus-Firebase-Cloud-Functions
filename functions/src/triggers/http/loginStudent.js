@@ -1,8 +1,8 @@
 // functions/src/triggers/http/loginStudent.js
 
-const functions = require("firebase-functions");
-const { Client } = require("pg");
-const { admin } = require("../../config/firebase");
+const { Client } = require('pg');
+const { admin } = require('../../config/firebase');
+const functions = require('firebase-functions');
 const cors = require("cors")({ origin: true });
 require("dotenv").config();
 
@@ -44,21 +44,26 @@ exports.loginStudent = functions.https.onRequest((req, res) => {
         return res.status(403).json({ message: "Unauthorized. No matching student record." });
       }
 
-      // 4. Fetch user profile (optional)
+      // 4. Fetch user profile
       const profileRes = await db.query(`
-        SELECT *
+        SELECT first_name, last_name, gender
         FROM "User_Profile"
         WHERE user_id = $1
       `, [uid]);
 
+      const profile = profileRes.rows[0] || {};
+
       await db.end();
 
+      // 5. Flatten response for frontend use
       return res.status(200).json({
         message: "Login verified successfully.",
         user_id: uid,
         email,
         role: "Student",
-        profile: profileRes.rows[0] || null
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+        gender: profile.gender || ""
       });
 
     } catch (err) {
