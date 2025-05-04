@@ -11,6 +11,8 @@
 
 //REGISTER APPLICANT HTTP
 const { registerApplicant } = require('./src/triggers/http/registerApplicant');
+const { loginStudent } = require('./triggers/http/loginStudent');
+
 
 
 // Export Auth Triggers
@@ -21,6 +23,7 @@ const { registerApplicant } = require('./src/triggers/http/registerApplicant');
 // exports.rickRoll = rickRollHTTP.rickRoll;
 exports.registerApplicant = registerApplicant;
 exports.verifyReferenceNumber = require('./triggers/http/verifyReferenceNumber').verifyReferenceNumber;
+exports.loginStudent = loginStudent; 
 
 // You can add more functions as you develop them
 // Example:
