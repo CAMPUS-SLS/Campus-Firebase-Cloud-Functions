@@ -1,1 +1,7 @@
-{}
+{
+  "projects": {
+    "campus-ar-adm": "campus-student-lifecycle"
+  },
+  "targets": {},
+  "etags": {}
+}

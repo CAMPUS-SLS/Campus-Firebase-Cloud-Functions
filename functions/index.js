@@ -13,6 +13,15 @@
 const { registerApplicant } = require('./src/triggers/http/registerApplicant');
 const { loginStudent } = require('./src/triggers/http/loginStudent');
 
+//Sponsors Function Chap4-AR-ADMIN
+const { getSponsors } = require("./src/triggers/http/sponsors");
+const { addSponsor } = require("./src/triggers/http/sponsors");
+const { updateSponsor } = require("./src/triggers/http/sponsors");
+const { deleteSponsor } = require("./src/triggers/http/sponsors");
+
+//Announcements Functions CHAP4-AR-ADMIN
+const { getAnnouncements } = require("./src/triggers/http/announcements");
+const { deleteAnnouncements } = require("./src/triggers/http/announcements");
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
@@ -34,6 +43,14 @@ exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
 exports.verifyStaff = verifyStaff;
 exports.getAllStaffVerification = getAllStaffVerification;
+
+exports.getSponsors = getSponsors;
+exports.addSponsor = addSponsor;
+exports.updateSponsor = updateSponsor;
+exports.deleteSponsor = deleteSponsor;
+
+exports.getAnnouncements = getAnnouncements;
+exports.deleteAnnouncements = deleteAnnouncements;
 
 // You can add more functions as you develop them
 // Example:
