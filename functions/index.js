@@ -28,6 +28,9 @@ const { addAnnouncementCategory } = require("./src/triggers/http/announcements")
 const { updateAnnouncement } = require("./src/triggers/http/announcements");
 const { archiveAnnouncement } = require("./src/triggers/http/announcements");
 
+//DocumentRequest
+const { getDocumentRequests } = require("./src/triggers/http/documentrequest");
+
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
@@ -62,6 +65,8 @@ exports.createAnnouncement = createAnnouncement;
 exports.addAnnouncementCategory = addAnnouncementCategory;
 exports.updateAnnouncement = updateAnnouncement;
 exports.archiveAnnouncement = archiveAnnouncement;
+
+exports.getDocumentRequests = getDocumentRequests;
 
 // You can add more functions as you develop them
 // Example:
