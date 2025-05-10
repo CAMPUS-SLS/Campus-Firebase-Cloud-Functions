@@ -22,6 +22,12 @@ const { deleteSponsor } = require("./src/triggers/http/sponsors");
 //Announcements Functions CHAP4-AR-ADMIN
 const { getAnnouncements } = require("./src/triggers/http/announcements");
 const { deleteAnnouncements } = require("./src/triggers/http/announcements");
+const { getAnnouncementCategories } = require("./src/triggers/http/announcements");
+const { createAnnouncement } = require("./src/triggers/http/announcements");
+const { addAnnouncementCategory } = require("./src/triggers/http/announcements");
+const { updateAnnouncement } = require("./src/triggers/http/announcements");
+const { archiveAnnouncement } = require("./src/triggers/http/announcements");
+
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
@@ -51,6 +57,11 @@ exports.deleteSponsor = deleteSponsor;
 
 exports.getAnnouncements = getAnnouncements;
 exports.deleteAnnouncements = deleteAnnouncements;
+exports.getAnnouncementCategories = getAnnouncementCategories;
+exports.createAnnouncement = createAnnouncement;
+exports.addAnnouncementCategory = addAnnouncementCategory;
+exports.updateAnnouncement = updateAnnouncement;
+exports.archiveAnnouncement = archiveAnnouncement;
 
 // You can add more functions as you develop them
 // Example:
