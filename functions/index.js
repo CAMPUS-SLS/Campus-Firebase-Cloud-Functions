@@ -21,6 +21,8 @@ const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVeri
 
 
 const { submitDocumentRequest } = require('./src/triggers/http/submitDocumentRequest');
+const { getColleges    } = require('./src/triggers/http/getColleges');
+const { getDepartments } = require('./src/triggers/http/getDepartments');
 
 const { getSponsorPerks   } = require('./src/triggers/http/getSponsorPerks');
 
@@ -43,8 +45,10 @@ exports.getAllStaffVerification = getAllStaffVerification;
 
 
 exports.submitDocumentRequest = submitDocumentRequest;
+exports.getColleges    = getColleges;
+exports.getDepartments = getDepartments;
 
-exports.getSponsorPerks    = getSponsorPerks;
+exports.getSponsorPerks = getSponsorPerks;
 
 
 // You can add more functions as you develop them
