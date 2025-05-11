@@ -22,6 +22,8 @@ const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVeri
 
 const { submitDocumentRequest } = require('./src/triggers/http/submitDocumentRequest');
 
+const { getSponsorPerks   } = require('./src/triggers/http/getSponsorPerks');
+
 
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
@@ -41,6 +43,8 @@ exports.getAllStaffVerification = getAllStaffVerification;
 
 
 exports.submitDocumentRequest = submitDocumentRequest;
+
+exports.getSponsorPerks    = getSponsorPerks;
 
 
 // You can add more functions as you develop them

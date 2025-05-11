@@ -4,43 +4,25 @@ const { Client }      = require('pg');
 const functions        = require('firebase-functions');
 const cors             = require('cors')({ origin: true });
 
-// Map full college name → college_id code  (we’ll still honor college mapping)
-const COLLEGE_MAP = {
-  'College of Information and Computing Sciences': 'CICS',
-  'Faculty of Pharmacy':                         'FOP',
-  'Faculty of Engineering':                      'FOE',
-  'Senior High School':                          'SHS',
-  'CICS': 'CICS',
-  'FOP':  'FOP',
-  'FOE':  'FOE',
-  'SHS':  'SHS',
-};
-
 exports.submitDocumentRequest = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
+    // Only allow POST
     if (req.method !== 'POST') {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
+    // 1️⃣ Pull form fields:
     const {
       documentType,
       lastName,
       fullName,
-      batch,
-      collegeDepartment,  // either full name or code
-      // program,          // ignored for now
-      message             // Reason for Request
+      batch,              // free-text
+      collegeDepartment,  // e.g. "College of Information and Computing Sciences"
+      program,            // e.g. "Information Systems"
+      message             // “Reason for Request”
     } = req.body;
 
-    // 1) Resolve college → code
-    const collegeCode = COLLEGE_MAP[collegeDepartment];
-    if (!collegeCode) {
-      return res
-        .status(400)
-        .json({ message: `Invalid college selection: ${collegeDepartment}` });
-    }
-
-    // 2) Connect to Postgres
+    // 2️⃣ Connect to Postgres
     const db = new Client({
       user:     'neondb_owner',
       host:     'ep-old-wind-a1kkjbku-pooler.ap-southeast-1.aws.neon.tech',
@@ -52,7 +34,31 @@ exports.submitDocumentRequest = functions.https.onRequest((req, res) => {
     await db.connect();
 
     try {
-      // 3) Generate next doc_request_id
+      // 3️⃣ Look up college_id & department_id based on names
+      const lookupRes = await db.query(
+        `
+          SELECT
+            c.college_id,
+            d.department_id
+          FROM "College"    AS c
+          JOIN "Department" AS d
+            ON c.college_id = d.college_id
+          WHERE c.college_name    = $1
+            AND d.department_name ILIKE '%' || $2 || '%'
+          LIMIT 1
+        `,
+        [ collegeDepartment, program ]
+      );
+
+      if (lookupRes.rowCount === 0) {
+        return res.status(400).json({
+          message: `Invalid college/department combination: ${collegeDepartment} / ${program}`
+        });
+      }
+
+      const { college_id, department_id } = lookupRes.rows[0];
+
+      // 4️⃣ Generate next DR### ID
       const { rows } = await db.query(`
         SELECT doc_request_id
           FROM "Document_Requests"
@@ -60,18 +66,18 @@ exports.submitDocumentRequest = functions.https.onRequest((req, res) => {
          ORDER BY doc_request_id DESC
          LIMIT 1
       `);
-      const lastId = rows[0]?.doc_request_id || 'DR000';
+      const lastId  = rows[0]?.doc_request_id || 'DR000';
       const nextNum = parseInt(lastId.slice(2), 10) + 1;
-      const doc_request_id = 'DR' + String(nextNum).padStart(3, '0');
+      const newId   = 'DR' + String(nextNum).padStart(3, '0');
 
-      // 4) Defaults
+      // 5️⃣ Prepare defaults
       const request_type = 'Document';
-      const is_shs       = (collegeCode === 'SHS');
+      const is_shs       = false;            // adjust as needed
       const status       = 'Pending';
       const admin_notes  = null;
       const created_at   = new Date().toISOString().split('T')[0];
 
-      // 5) Insert—with collegeCode, NOTE: COLLEGE_ID (7), DEPARTMERNT(14), PROGRAM(15) are set to null temporarily for testing
+      // 6️⃣ Insert using the looked-up IDs
       await db.query(
         `INSERT INTO "Document_Requests" (
            doc_request_id,
@@ -82,36 +88,37 @@ exports.submitDocumentRequest = functions.https.onRequest((req, res) => {
            full_name,
            college_id,
            is_shs,
-           department_id,  
+           department_id,
            purpose,
-           status,                                      
+           status,
            admin_notes,
            created_at,
            batch,
-           department,     
-           program         
+           department,
+           program
          ) VALUES (
            $1,$2,$3,$4,
-           $5,$6,NULL,$8,
-           NULL,$9,$10,$11,
-           $12,$13,NULL,NULL
+           $5,$6,$7,$8,
+           $9,$10,$11,$12,
+           $13,$14,$15,$16
          )`,
         [
-          doc_request_id,      // $1
-          null,                // $2  user_id
+          newId,               // $1
+          null,                // $2  (user_id)
           request_type,        // $3
           documentType,        // $4
           lastName,            // $5
           fullName,            // $6
-          collegeCode,         // $7  mapped college_id
+          college_id,          // $7
           is_shs,              // $8
-          message,             // $9  purpose
-          status,              // $10
-          admin_notes,         // $11
-          created_at,          // $12
-          batch,               // $13
-          collegeDepartment    // $14 text copy of the college name
-          // $15 for program omitted, so program will be NULL
+          department_id,       // $9
+          message,             // $10
+          status,              // $11
+          admin_notes,         // $12
+          created_at,          // $13
+          batch,               // $14
+          collegeDepartment,   // $15 store display name
+          program              // $16 store display name
         ]
       );
 
