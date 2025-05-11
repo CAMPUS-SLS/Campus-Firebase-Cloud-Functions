@@ -21,6 +21,8 @@ const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVeri
 
 //Timeslot
 const { createTimeSlot } = require("./src/triggers/http/createTimeSlot");
+const { findSchedule } = require("./src/triggers/http/findSchedule");
+const { getCurriculum } = require("./src/triggers/http/getCurriculum")
 
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
@@ -37,7 +39,10 @@ exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
 exports.verifyStaff = verifyStaff;
 exports.getAllStaffVerification = getAllStaffVerification;
+
 exports.createTimeSlot = createTimeSlot;
+exports.findSchedule = findSchedule;
+exports.getCurriculum = getCurriculum;
 
 // You can add more functions as you develop them
 // Example:
