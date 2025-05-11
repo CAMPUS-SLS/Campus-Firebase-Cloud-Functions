@@ -19,6 +19,12 @@ const { registerStaff } = require("./src/triggers/http/registerStaff");
 const { verifyStaff } = require("./src/triggers/http/verifyStaff");
 const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVerification");
 
+//EVALUATION
+const { saveEvaluationForm } = require("./src/triggers/http/saveEvaluationForm");
+const { getEvaluationForm } = require("./src/triggers/http/getEvaluationForm");
+const { submitEvaluationResponse } = require("./src/triggers/http/submitEvaluationResponse");
+const { getUniversityByAdmin } = require("./src/triggers/http/getUniversityByAdmin");
+
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
 // exports.logUserDeletedRickRoll = rickRollAuthTriggers.logUserDeletedRickRoll;
@@ -34,6 +40,10 @@ exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
 exports.verifyStaff = verifyStaff;
 exports.getAllStaffVerification = getAllStaffVerification;
+exports.saveEvaluationForm = saveEvaluationForm;
+exports.getEvaluationForm = getEvaluationForm;
+exports.submitEvaluationResponse = submitEvaluationResponse;
+exports.getUniversityByAdmin = getUniversityByAdmin;
 
 // You can add more functions as you develop them
 // Example:
