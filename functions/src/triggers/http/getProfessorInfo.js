@@ -11,13 +11,13 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-exports.getCurriculum = functions.https.onRequest(async (req, res) => {
+exports.getProfessorInfo = functions.https.onRequest(async (req, res) => {
   cors(req, res, async () => {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { info, getCourses } = req.body;
+    const { info, getCourses, getAvailability } = req.body;
 
     if (!info) {
       return res.status(400).json({ error: 'Missing values' });
@@ -26,25 +26,21 @@ exports.getCurriculum = functions.https.onRequest(async (req, res) => {
     let query
 
     if(getCourses){
-        query = `SELECT * FROM "Curriculum_Courses_Fact" WHERE curriculum_id =$1
+        query = `SELECT * FROM "Professor_Load" WHERE professor_id = $1
+    `
+    } else if(getAvailability) {
+        query = `
+        SELECT * FROM "Professor_Availability" WHERE professor_id = $1
     `
     } else {
-        query = `SELECT * FROM "Curriculum"
+        query = `SELECT * FROM "Professor" WHERE professor_id = $1
     `
     }
 
     const sql = query;
 
     try {
-
-        let chosenQuery
-        if(getCourses){
-        chosenQuery = await pool.query(sql, [info]);
-        } else {
-        chosenQuery = await pool.query(sql);
-        }
-
-        const { rows } = chosenQuery
+        const { rows } = await pool.query(sql, [info]);
 
 
       return res.status(200).json(rows);
@@ -58,13 +54,13 @@ exports.getCurriculum = functions.https.onRequest(async (req, res) => {
 /*
 FRONTEND CODE SAMPLE
 
-fetch("https://asia-southeast1-campus-student-lifecycle.cloudfunctions.net/getCurriculum", {
+fetch("https://asia-southeast1-campus-student-lifecycle.cloudfunctions.net/getProfessorInfo", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
-    info: "CURR001",
+    info: "P001",
     getCourses: true // 
   })
 })
