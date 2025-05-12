@@ -17,21 +17,31 @@ exports.addCurriculum = functions.https.onRequest(async (req, res) => {
       return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { curriculumName, departmentid, acadyear, acadterm, effectiveYear } = req.body;
-
-    if (!curriculumName || !departmentid || !acadyear || !acadterm || !effectiveYear) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
+    const { curriculumName, departmentid, acadyear, acadterm, effectiveYear, newCourse, curriculumid } = req.body;
 
     const id = "CURR"+ Date.now()
+    const alternateid = "CCF"+ Date.now()
 
-    const sql = `
+    let query
+
+    query = `
       INSERT INTO "Curriculum"(curriculum_id, department_id, curriculum_name, acad_year, acad_term, effective_start_year, is_active)
         VALUES ($1, $2, $3, $4, $5, $6, true) RETURNING *
 
-    `;
+    `; 
 
-    const values = [
+    if(newCourse&&curriculumid){
+    query = `
+    INSERT INTO "Curriculum_Courses_Fact"(curr_course_id, curriculum_id, course_id, yearlevel,term)
+    VALUES ($1, $2, $3, $4, $5)
+    `
+    }
+
+    const sql = query
+
+    let selectedValues 
+
+    selectedValues = [
       id,
       departmentid, 
       curriculumName,
@@ -39,6 +49,16 @@ exports.addCurriculum = functions.https.onRequest(async (req, res) => {
       acadterm, 
       effectiveYear,
     ];
+
+    if(newCourse&&curriculumid){
+      selectedValues = [
+        alternateid,
+        curriculumid,
+        newCourse,
+        acadyear,
+        acadterm
+      ]
+    }
 
     try {
       const result = await pool.query(sql, values);
@@ -63,7 +83,22 @@ fetch("https://asia-southeast1-campus-student-lifecycle.cloudfunctions.net/addCu
     departmentid: "DEP001", 
     acadyear: "Rizzler", 
     acadterm: "Rizzler", 
-    effectiveYear: 2000,
+    effectiveYear: 2000
+  })
+})
+
+//ALTERNATE CODE TO ADD A COURSE
+
+fetch("https://asia-southeast1-campus-student-lifecycle.cloudfunctions.net/addCurriculum", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    curriculumid: "CURR001"
+    newCourse: "COURSE001", 
+    acadyear: 1, 
+    acadterm: "2nd Semester", 
   })
 })
 
