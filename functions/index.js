@@ -4,19 +4,18 @@
  * This file exports all Cloud Functions for deployment
  */
 
-// Import all your function modules
-const rickRollAuthTriggers = require('./triggers/auth/rickRollAuthTrigger');
-const rickRollHTTP = require('./triggers/http/rickRollCallable');
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
 
-// Export Auth Triggers
-exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
-exports.logUserDeletedRickRoll = rickRollAuthTriggers.logUserDeletedRickRoll;
+// Initialize Firebase Admin
+admin.initializeApp();
 
-// Export HTTP Functions
-exports.rickRoll = rickRollHTTP.rickRoll;
+// Import function modules
+const documentFilter = require('./src/triggers/http/admin/filters/Filter-Document_View-ADMIN');
 
-// You can add more functions as you develop them
-// Example:
-// exports.anotherFunction = require('./path/to/file').functionName;
+// Export Filter Functions with region specification
+exports.filterDocumentData = functions
+  .runWith({ region: 'asia-southeast1' })
+  .https.onCall(documentFilter.filterDocumentData);
 
 console.log('Firebase Functions initialized');
