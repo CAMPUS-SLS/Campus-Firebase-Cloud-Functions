@@ -1,111 +1,83 @@
-//idk using as a note for now
+const functions = require("firebase-functions");
+const cors = require("cors")({ origin: true });
+const { Pool } = require("pg");
 
-SELECT 
-    s.student_id,
-    s.student_name,
-    c.course_name,
-    t.timeslot_day,
-    t.timeslot_time
-FROM 
-    student s
-JOIN 
-    enrollment e ON s.student_id = e.student_id
-JOIN 
-    course c ON e.course_id = c.course_id
-JOIN 
-    timeslot t ON c.timeslot_id = t.timeslot_ida
-WHERE 
-    s.student_id = 'STUDENT_ID_HERE';=
+const pool = new Pool({
+  user: 'neondb_owner',
+  host: 'ep-old-wind-a1kkjbku-pooler.ap-southeast-1.aws.neon.tech',
+  database: 'neondb',
+  password: 'npg_mQOGqHwl95Cd',
+  port: 5432,
+  ssl: { rejectUnauthorized: false },
+});
 
+exports.getStudentSchedule = functions.https.onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== 'GET') {
+      return res.status(405).json({ error: 'Method Not Allowed' });
+    }
 
+    const query = `
+      SELECT
+          c.course_id AS subject_code,
+          c.course_title AS subject_desc,
+          c.lec_units,
+          c.lab_units,
+          s.section_desc AS section,
+          t.weekday AS day,
+          t.timeslot_start AS startTime,
+          t.timeslot_end AS endTime,
+          rm.floor_no || ' ' || rm.building AS location,
+          rm.room_no AS room,
+          CONCAT(up.last_name, ', ', up.first_name) AS instructor
+      FROM
+          "Course" c
+      JOIN
+          "Timeslot" t ON c.course_id = t.course_id
+      JOIN
+          "Section" s ON t.section_id = s.section_id
+      JOIN
+          "Room" rm ON t.room_id = rm.room_id
+      JOIN
+          "Professor" p ON t.professor_id = p.professor_id
+      JOIN
+          "User_Profile" up ON p.user_id = up.user_id;
+    `;
 
-//course table
-SELECT
-  c.course_id as subject_code,
-  c.course_title as subject_desc,
-	c.lec_units,
-	c.lab_units
-	
-FROM
-    "Course" c
-
-//room table
-SELECT
-	rm.room_id, 
-	rm.floor_no || ' ' || rm.building as location, 
-	rm.room_no as room 
-	
-FROM
-    "Room" rm
-
-//timeslot table
-SELECT
-	t.section_id,
-	t.course_id,
-	t.weekday,
-	t.room_id,
-	t.professor_id,
-	t.timeslot_start as startTime,
-	t.timeslot_end as endTime
-FROM
-    "Timeslot" t
-
-//section table
-SELECT
-	s.section_id,
-	s.section_desc as section
-FROM
-    "Section" s
+    try {
+      const { rows } = await pool.query(query);
+      return res.status(200).json(rows);
+    } catch (error) {
+      console.error('Database error:', error.message);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+});
 
 
-    
-//up = user_profile
-//c - course
-//s = student
-//t = timeslot
-//rm = room
-//p = professor
-//u = user
-
-
-
-//c.course_id = subject_code
-//c.course_title = subject_desc
-//c.lec_units = lec_units
-//c.lab_units = lab_units
-//s.section_id = t.section_id = section
-//t.weekday = day
-//t.room_id = rm.room_id
-//rm.floor_no, rm.building = location
-//rm.room_no = room
-//t.professor_id = p.professor_id  ->  p.user_id = u.user_id = up.user_id   ->  up.last_name + ", " + up.first_name = instructor
-//c.course_id = t.course_id = subject_code
-
-
-    export const subjects = [
-        {
-          subject_id: 1,
-          subject_code: "SUB0001",
-          subject_desc: "DOLORIS LOREM IPSUM DOLOR SIT AMET",
-          lec_units: 3,
-          lab_units: 3,
-          section: "1-A",
-          location: "Ave Mujica Building",
-          color: "#F7CA18", // yellow
-          schedules: [
-            {
-              day: "MON",
-              startTime: "7:00 AM",
-              endTime: "8:00 AM",
-              room: "Room 1234",
-              instructor: "Lika Cruz",
-            },
-            {
-              day: "THU",
-              startTime: "6:00 PM",
-              endTime: "9:00 PM",
-              room: "Room 1234",
-              instructor: "Lika Cruz",
-            },
-          ],
-        },
+/* 
+      SELECT
+          c.course_id AS subject_code,
+          c.course_title AS subject_desc,
+          c.lec_units,
+          c.lab_units,
+          s.section_desc AS section,
+          t.weekday AS day,
+          t.timeslot_start AS startTime,
+          t.timeslot_end AS endTime,
+          rm.floor_no || ' ' || rm.building AS location,
+          rm.room_no AS room,
+          CONCAT(up.last_name, ', ', up.first_name) AS instructor
+      FROM
+          "Course" c
+      JOIN
+          "Timeslot" t ON c.course_id = t.course_id
+      JOIN
+          "Section" s ON t.section_id = s.section_id
+      JOIN
+          "Room" rm ON t.room_id = rm.room_id
+      JOIN
+          "Professor" p ON t.professor_id = p.professor_id
+      JOIN
+          "User_Profile" up ON p.user_id = up.user_id;
+*/
