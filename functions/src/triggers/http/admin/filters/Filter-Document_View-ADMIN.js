@@ -9,15 +9,15 @@ const pool = require('../../../../config/db-config');
  * @returns {Promise<Object>} - Filtered document data
  */
 const filterDocumentData = async (data, context) => {
-    // Verify admin authentication
-    if (!context.auth || !context.auth.token.admin) {
-        throw new functions.https.HttpsError(
-            'permission-denied',
-            'Only administrators can access this function'
-        );
-    }
-
     try {
+        // Verify admin authentication
+        if (!context.auth || !context.auth.token.admin) {
+            throw new functions.https.HttpsError(
+                'permission-denied',
+                'Only administrators can access this function'
+            );
+        }
+
         const { filterCriteria = {} } = data;
         const {
             documentType,
@@ -101,4 +101,4 @@ const filterDocumentData = async (data, context) => {
 
 module.exports = {
     filterDocumentData
-}; 
+};
