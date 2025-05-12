@@ -13,6 +13,11 @@
 const { registerApplicant } = require('./src/triggers/http/registerApplicant');
 const { loginStudent } = require('./src/triggers/http/loginStudent');
 
+//VerifyAdmin getAdminProfile
+const { verifyAdmin } = require("./src/triggers/http/Login");
+const { getUserProfile } = require("./src/triggers/http/Login");
+const { getAdminProfile } = require("./src/triggers/http/Login");
+
 //Sponsors Function Chap4-AR-ADMIN
 const { getSponsors } = require("./src/triggers/http/sponsors");
 const { addSponsor } = require("./src/triggers/http/sponsors");
@@ -56,6 +61,10 @@ exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
 exports.verifyStaff = verifyStaff;
 exports.getAllStaffVerification = getAllStaffVerification;
+
+exports.verifyAdmin = verifyAdmin;
+exports.getUserProfile = getUserProfile;
+exports.getAdminProfile = getAdminProfile
 
 exports.getSponsors = getSponsors;
 exports.addSponsor = addSponsor;
