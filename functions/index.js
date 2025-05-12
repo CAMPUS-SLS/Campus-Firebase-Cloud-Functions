@@ -15,7 +15,7 @@ const documentFilter = require('./src/triggers/http/admin/filters/Filter-Documen
 
 // Export Filter Functions with region specification
 exports.filterDocumentData = functions
-  .runWith({ region: 'asia-southeast1' })
+  .region('asia-southeast1')
   .https.onCall(documentFilter.filterDocumentData);
 
 console.log('Firebase Functions initialized');
