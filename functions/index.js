@@ -19,6 +19,14 @@ const { registerStaff } = require("./src/triggers/http/registerStaff");
 const { verifyStaff } = require("./src/triggers/http/verifyStaff");
 const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVerification");
 
+//Timeslot
+const { createTimeSlot } = require("./src/triggers/http/createTimeSlot");
+const { findSchedule } = require("./src/triggers/http/findSchedule");
+const { getCurriculum } = require("./src/triggers/http/getCurriculum")
+const { getProfessorInfo } = require("./src/triggers/http/getProfessorInfo")
+const { verifyTimeAvailability } = require("./src/triggers/http/verifyTimeAvailability")
+const { addCurriculum } = require("./src/triggers/http/addCurriculum")
+
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
 // exports.logUserDeletedRickRoll = rickRollAuthTriggers.logUserDeletedRickRoll;
@@ -34,6 +42,13 @@ exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
 exports.verifyStaff = verifyStaff;
 exports.getAllStaffVerification = getAllStaffVerification;
+
+exports.createTimeSlot = createTimeSlot;
+exports.findSchedule = findSchedule;
+exports.getCurriculum = getCurriculum;
+exports.getProfessorInfo = getProfessorInfo;
+exports.verifyTimeAvailability = verifyTimeAvailability;
+exports.addCurriculum = addCurriculum;
 
 // You can add more functions as you develop them
 // Example:
