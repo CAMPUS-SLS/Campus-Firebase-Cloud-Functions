@@ -28,22 +28,102 @@ exports.findSchedule = functions.https.onRequest(async (req, res) => {
     switch (searchType) {
         case "P":    
             query = `
-            SELECT * FROM "Timeslot" WHERE professor_id = $1;
+            SELECT timeslot_id, first_name ||' '|| last_name AS professor, 
+            timeslot_start, 
+            timeslot_end, 
+            weekday, course_title, 
+            course_description, 
+            room_no, section_desc, 
+            section_id FROM
+	    (
+	    SELECT a.*, user_id, course_title, course_description, room_no, section_desc FROM "Timeslot" 
+	    AS a 
+	    LEFT JOIN 
+	    "Professor" AS b ON a.professor_id = b.professor_id
+	    LEFT JOIN
+	    "Course" AS d ON d.course_id = a.course_id
+	    LEFT JOIN
+	    "Room" AS r ON r.room_id = a.room_id
+	    LEFT JOIN
+	    "Section" AS s ON s.section_id = a.section_id
+	    ) AS a
+	    LEFT JOIN "User_Profile" AS b ON a.user_id = b.user_id 
+	        WHERE professor_id = $1
             `
             break;
         case "S":
             query = `
-            SELECT * FROM "Timeslot" WHERE section_id = $1;
+                        SELECT timeslot_id, first_name ||' '|| last_name AS professor, 
+            timeslot_start, 
+            timeslot_end, 
+            weekday, course_title, 
+            course_description, 
+            room_no, section_desc, 
+            section_id FROM
+	    (
+	    SELECT a.*, user_id, course_title, course_description, room_no, section_desc FROM "Timeslot" 
+	    AS a 
+	    LEFT JOIN 
+	    "Professor" AS b ON a.professor_id = b.professor_id
+	    LEFT JOIN
+	    "Course" AS d ON d.course_id = a.course_id
+	    LEFT JOIN
+	    "Room" AS r ON r.room_id = a.room_id
+	    LEFT JOIN
+	    "Section" AS s ON s.section_id = a.section_id
+	    ) AS a
+	    LEFT JOIN "User_Profile" AS b ON a.user_id = b.user_id 
+            WHERE section_id = $1;
             `
             break;
         case "R":
             query = `
-            SELECT * FROM "Timeslot" WHERE room_id = $1;
+                        SELECT timeslot_id, first_name ||' '|| last_name AS professor, 
+            timeslot_start, 
+            timeslot_end, 
+            weekday, course_title, 
+            course_description, 
+            room_no, section_desc, 
+            section_id FROM
+	    (
+	    SELECT a.*, user_id, course_title, course_description, room_no, section_desc FROM "Timeslot" 
+	    AS a 
+	    LEFT JOIN 
+	    "Professor" AS b ON a.professor_id = b.professor_id
+	    LEFT JOIN
+	    "Course" AS d ON d.course_id = a.course_id
+	    LEFT JOIN
+	    "Room" AS r ON r.room_id = a.room_id
+	    LEFT JOIN
+	    "Section" AS s ON s.section_id = a.section_id
+	    ) AS a
+	    LEFT JOIN "User_Profile" AS b ON a.user_id = b.user_id  
+            WHERE room_id = $1;
             `
             break;
         case "C":
             query = `
-            SELECT * FROM "Timeslot" WHERE course_id = $1;
+                        SELECT timeslot_id, first_name ||' '|| last_name AS professor, 
+            timeslot_start, 
+            timeslot_end, 
+            weekday, course_title, 
+            course_description, 
+            room_no, section_desc, 
+            section_id FROM
+	    (
+	    SELECT a.*, user_id, course_title, course_description, room_no, section_desc FROM "Timeslot" 
+	    AS a 
+	    LEFT JOIN 
+	    "Professor" AS b ON a.professor_id = b.professor_id
+	    LEFT JOIN
+	    "Course" AS d ON d.course_id = a.course_id
+	    LEFT JOIN
+	    "Room" AS r ON r.room_id = a.room_id
+	    LEFT JOIN
+	    "Section" AS s ON s.section_id = a.section_id
+	    ) AS a
+	    LEFT JOIN "User_Profile" AS b ON a.user_id = b.user_id 
+            WHERE course_id = $1;
             `
             break;
         default:
