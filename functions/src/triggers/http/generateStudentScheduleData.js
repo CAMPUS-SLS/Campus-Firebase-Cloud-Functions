@@ -28,6 +28,7 @@ exports.generateStudentScheduleData = functions.https.onRequest(async (req, res)
 
     const query = `
       SELECT
+        st.user_id,
         c.course_id AS subject_code,
         c.course_title AS subject_desc,
         c.lec_units,
