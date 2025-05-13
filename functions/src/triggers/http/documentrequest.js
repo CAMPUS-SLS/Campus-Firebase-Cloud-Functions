@@ -12,25 +12,115 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-exports.getDocumentRequests = functions.https.onRequest(async (req, res) => {
-  try {
-    const snapshot = await db.collection("Document_Requests").get();
+// ✅ GET: Fetch all document requests with complete info
+exports.getDocumentRequests = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      const result = await pool.query(`
+        SELECT 
+          dr."doc_request_id",
+          dr."document_type",
+          dr."status",
+          dr."created_at",
+          dr."batch",
+          dr."purpose",
+          up."first_name",
+          up."last_name",
+          up."contact_no",
+          u."email",
+          d."department_name",
+          d."program_desc",
+          ap."payment_method",
+          ap."amount_paid",
+          ap."payment_date",
+          ap."reference_no"
+        FROM "Document_Requests" dr
+        JOIN "User" u ON dr."user_id" = u."user_id"
+        JOIN "User_Profile" up ON u."user_id" = up."user_id"
+        JOIN "Department" d ON dr."department_id" = d."department_id"
+        LEFT JOIN "Alumni_Payment" ap ON ap."user_id" = u."user_id"
+      `);
 
-    const requests = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id, // optional: used for routing to detail view
-        firstName: data.firstName || "",
-        lastName: data.lastName || "",
-        documentType: data.documentType || "",
-        requestDate: data.requestDate || "",
-        status: data.status || "",
-      };
-    });
+      const requests = result.rows.map((row, index) => ({
+        id: `${row.doc_request_id}-${index}`,
+        doc_request_id: row.doc_request_id,
+        firstName: row.first_name,
+        lastName: row.last_name,
+        email: row.email,
+        contactNum: row.contact_no,
+        batch: row.batch,
+        reason: row.purpose,
+        documentType: row.document_type,
+        requestDate: row.created_at,
+        status: row.status,
+        collegeDept: row.department_name,
+        program: row.program_desc,
+        paymentMode: row.payment_method,
+        amountPaid: row.amount_paid,
+        paymentDate: row.payment_date,
+        referenceNumber: row.reference_no
+      }));
 
-    res.status(200).json(requests);
-  } catch (error) {
-    console.error("Error fetching document requests:", error);
-    res.status(500).send("Internal Server Error");
-  }
+      res.status(200).json(requests);
+    } catch (error) {
+      console.error("❌ Error in getDocumentRequests:", error.message);
+      res.status(500).json({ error: "Internal Server Error", details: error.message });
+    }
+  });
+});
+
+// ✅ POST: Delete selected document requests
+exports.deleteDocumentRequests = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).json({ message: "Method Not Allowed" });
+    }
+
+    const { ids } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: "No document request IDs provided" });
+    }
+
+    try {
+      const placeholders = ids.map((_, i) => `$${i + 1}`).join(",");
+      const query = `DELETE FROM "Document_Requests" WHERE "doc_request_id" IN (${placeholders})`;
+
+      await pool.query(query, ids);
+
+      res.status(200).json({ message: "Document requests deleted successfully" });
+    } catch (error) {
+      console.error("❌ Error in deleteDocumentRequests:", error.message);
+      res.status(500).json({ message: "Internal Server Error", details: error.message });
+    }
+  });
+});
+
+// ✅ POST: Update status only (admin_notes excluded)
+exports.updateDocumentRequestStatus = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).json({ message: "Method Not Allowed" });
+    }
+
+    const { doc_request_id, new_status } = req.body;
+
+    if (!doc_request_id || !new_status) {
+      return res.status(400).json({ message: "Missing doc_request_id or new_status" });
+    }
+
+    try {
+      await pool.query(
+        `UPDATE "Document_Requests"
+         SET "status" = $1
+         WHERE "doc_request_id" = $2`,
+        [new_status, doc_request_id]
+      );
+
+      res.status(200).json({ message: "Status updated successfully" });
+    } catch (error) {
+      console.error("❌ Error in updateDocumentRequestStatus:", error.message);
+      res.status(500).json({ message: "Internal Server Error", details: error.message });
+    }
+  });
 });
