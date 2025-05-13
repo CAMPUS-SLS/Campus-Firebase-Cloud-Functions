@@ -1,6 +1,5 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const pool = require('../../../../config/db-config');
 
 /**
  * Filter document data based on provided criteria
@@ -10,91 +9,55 @@ const pool = require('../../../../config/db-config');
  */
 const filterDocumentData = async (data, context) => {
     try {
+        console.log('Function called with data:', data);
+        console.log('Context:', context);
+
         // Verify admin authentication
         if (!context.auth || !context.auth.token.admin) {
+            console.log('Authentication failed:', context.auth);
             throw new functions.https.HttpsError(
                 'permission-denied',
                 'Only administrators can access this function'
             );
         }
 
-        const { filterCriteria = {} } = data;
-        const {
-            documentType,
-            status,
-            dateCreated,
-            dateModified,
-            author,
-            department,
-            tags
-        } = filterCriteria;
-
-        // Build the SQL query
-        let query = 'SELECT * FROM documents WHERE 1=1';
-        const params = [];
-        let paramCount = 1;
-
-        if (documentType) {
-            query += ` AND document_type = $${paramCount}`;
-            params.push(documentType);
-            paramCount++;
-        }
-
-        if (status) {
-            query += ` AND status = $${paramCount}`;
-            params.push(status);
-            paramCount++;
-        }
-
-        if (author) {
-            query += ` AND author = $${paramCount}`;
-            params.push(author);
-            paramCount++;
-        }
-
-        if (department) {
-            query += ` AND department = $${paramCount}`;
-            params.push(department);
-            paramCount++;
-        }
-
-        if (dateCreated) {
-            query += ` AND date_created >= $${paramCount}`;
-            params.push(dateCreated);
-            paramCount++;
-        }
-
-        if (dateModified) {
-            query += ` AND date_modified >= $${paramCount}`;
-            params.push(dateModified);
-            paramCount++;
-        }
-
-        if (tags && tags.length > 0) {
-            query += ` AND tags && $${paramCount}`;
-            params.push(tags);
-            paramCount++;
-        }
-
-        // Execute the query
-        const result = await pool.query(query, params);
-        const documents = result.rows;
-
-        return {
+        // For testing connection - return a simple response
+        const response = {
             success: true,
-            data: documents,
+            data: [
+                {
+                    id: "TEST001",
+                    documentType: "Test Document",
+                    status: "Test Status",
+                    dateCreated: new Date().toISOString(),
+                    author: "Test Author",
+                    department: "Test Department"
+                }
+            ],
             metadata: {
-                totalFiltered: documents.length,
-                filtersApplied: Object.keys(filterCriteria).filter(key => filterCriteria[key])
+                totalFiltered: 1,
+                filtersApplied: Object.keys(data.filterCriteria || {}),
+                message: "Connection test successful"
             }
         };
 
+        console.log('Sending response:', response);
+        return response;
+
     } catch (error) {
-        console.error('Error in filterDocumentData:', error);
+        console.error('Detailed error in filterDocumentData:', {
+            error: error,
+            message: error.message,
+            stack: error.stack
+        });
+        
         throw new functions.https.HttpsError(
             'internal',
             'An error occurred while filtering documents',
-            error.message
+            {
+                originalError: error.message,
+                stack: error.stack
+            }
         );
     }
 };

@@ -15,7 +15,15 @@ admin.initializeApp();
 exports.filterDocumentData = functions
   .region('asia-southeast1')
   .https.onCall(async (data, context) => {
-    return await documentFilter.filterDocumentData(data, context);
+    try {
+      return await documentFilter.filterDocumentData(data, context);
+    } catch (error) {
+      console.error('Error in filterDocumentData:', error);
+      throw new functions.https.HttpsError(
+        'internal',
+        error.message || 'An error occurred while filtering documents'
+      );
+    }
   });
 
 console.log('Firebase Functions initialized');
