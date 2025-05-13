@@ -32,7 +32,7 @@ exports.addCurriculum = functions.https.onRequest(async (req, res) => {
 
     if(newCourse&&curriculumid){
     query = `
-    INSERT INTO "Curriculum_Courses_Fact"(curr_course_id, curriculum_id, course_id, yearlevel,term)
+    INSERT INTO "Curriculum_Courses_Fact"(curr_course_id, curriculum_id, course_id, year_level,term)
     VALUES ($1, $2, $3, $4, $5)
     `
     }
@@ -57,8 +57,10 @@ exports.addCurriculum = functions.https.onRequest(async (req, res) => {
         newCourse,
         acadyear,
         acadterm
-      ]
+      ];
     }
+
+    const values = selectedValues
 
     try {
       const result = await pool.query(sql, values);
@@ -87,7 +89,7 @@ fetch("https://asia-southeast1-campus-student-lifecycle.cloudfunctions.net/addCu
   })
 })
 
-//ALTERNATE CODE TO ADD A COURSE
+//ALTERNATE CODE TO ADD A COURSE TO A CURRICULUM
 
 fetch("https://asia-southeast1-campus-student-lifecycle.cloudfunctions.net/addCurriculum", {
   method: "POST",
