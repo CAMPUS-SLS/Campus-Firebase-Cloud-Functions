@@ -11,13 +11,13 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-exports.getCurriculum = functions.https.onRequest(async (req, res) => {
+exports.getDropdownInfo = functions.https.onRequest(async (req, res) => {
   cors(req, res, async () => {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { info, getCourses } = req.body;
+    const { getDepartment, getCourses, getSection } = req.body;
 
     if (!info) {
       return res.status(400).json({ error: 'Missing values' });
@@ -25,30 +25,24 @@ exports.getCurriculum = functions.https.onRequest(async (req, res) => {
 
     let query
 
-    if(getCourses){
-        query = `SELECT * FROM "Curriculum_Courses_Fact" WHERE curriculum_id =$1
+    if( getDepartment ){
+        query = `SELECT * FROM "Department"
     `
-    } else {
-        query = `SELECT "Curriculum".*, department_name FROM "Curriculum" LEFT JOIN "Department" 
-                ON
-                "Curriculum".department_id = "Department".department_id
+    } else if( getSection ) {
+        query = `SELECT * FROM "Section"
     `
-    }
+    } else if( getCourses ) {
+        query = `SELECT * FROM "Courses"
+    `
+    } 
 
     const sql = query;
 
     try {
 
         let chosenQuery
-        if(getCourses){
-        chosenQuery = await pool.query(sql, [info]);
-        } else {
         chosenQuery = await pool.query(sql);
-        }
-
         const { rows } = chosenQuery
-
-
       return res.status(200).json(rows);
     } catch (error) {
       console.error('Database error:', error.message);

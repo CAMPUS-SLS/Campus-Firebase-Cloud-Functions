@@ -26,6 +26,7 @@ const { getCurriculum } = require("./src/triggers/http/getCurriculum")
 const { getProfessorInfo } = require("./src/triggers/http/getProfessorInfo")
 const { verifyTimeAvailability } = require("./src/triggers/http/verifyTimeAvailability")
 const { addCurriculum } = require("./src/triggers/http/addCurriculum")
+const { getDropdownInfo } = require("./src/triggers/http/getDropdownInfo")
 
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
@@ -49,6 +50,7 @@ exports.getCurriculum = getCurriculum;
 exports.getProfessorInfo = getProfessorInfo;
 exports.verifyTimeAvailability = verifyTimeAvailability;
 exports.addCurriculum = addCurriculum;
+exports.getDropdownInfo = getDropdownInfo;
 
 // You can add more functions as you develop them
 // Example:
