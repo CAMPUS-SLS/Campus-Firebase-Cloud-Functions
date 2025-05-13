@@ -20,7 +20,7 @@ const generateRandomColor = () => {
   return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`; // Convert to hex
 };
 
-exports.getStudentSchedule = functions.https.onRequest(async (req, res) => {
+exports.generateStudentScheduleData = functions.https.onRequest(async (req, res) => {
   cors(req, res, async () => {
     if (req.method !== 'GET') {
       return res.status(405).json({ error: 'Method Not Allowed' });
