@@ -10,6 +10,7 @@ exports.submitDocumentRequest = functions.https.onRequest((req, res) => {
       return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
+    // 1️⃣ Pull form fields (now including userId)
     const {
       documentType,
       lastName,
@@ -17,9 +18,15 @@ exports.submitDocumentRequest = functions.https.onRequest((req, res) => {
       batch,
       collegeDepartment,  // college_id
       program,            // department_id
-      message             // purpose
+      message,            // purpose
+      userId              // <— logged-in user's ID
     } = req.body;
 
+    if (!userId) {
+      return res.status(400).json({ message: 'userId is required' });
+    }
+
+    // 2️⃣ Connect to Postgres
     const db = new Client({
       user:     'neondb_owner',
       host:     'ep-old-wind-a1kkjbku-pooler.ap-southeast-1.aws.neon.tech',
@@ -31,7 +38,7 @@ exports.submitDocumentRequest = functions.https.onRequest((req, res) => {
     await db.connect();
 
     try {
-      // Generate next DR### ID
+      // 3️⃣ Generate next DR### ID
       const lastRow = await db.query(`
         SELECT doc_request_id
           FROM "Document_Requests"
@@ -43,14 +50,14 @@ exports.submitDocumentRequest = functions.https.onRequest((req, res) => {
       const nextNum = parseInt(lastId.slice(2), 10) + 1;
       const newId   = 'DR' + String(nextNum).padStart(3, '0');
 
-      // Defaults
+      // 4️⃣ Defaults
       const request_type = 'Document';
       const is_shs       = false;
       const status       = 'Pending';
       const admin_notes  = null;
       const created_at   = new Date().toISOString().split('T')[0];
 
-      // Insert into your 14-column table
+      // 5️⃣ Insert into your 14-column table
       await db.query(
         `INSERT INTO "Document_Requests" (
            doc_request_id,
@@ -74,8 +81,8 @@ exports.submitDocumentRequest = functions.https.onRequest((req, res) => {
            $13,$14
          )`,
         [
-          newId,               // $1
-          null,                // $2
+          newId,               // $1 doc_request_id
+          userId,              // $2 user_id
           request_type,        // $3
           documentType,        // $4
           lastName,            // $5
