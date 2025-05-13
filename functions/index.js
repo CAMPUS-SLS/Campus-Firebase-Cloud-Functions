@@ -26,6 +26,7 @@ const { getDepartments } = require('./src/triggers/http/getDepartments');
 
 const { getSponsorPerks   } = require('./src/triggers/http/getSponsorPerks');
 
+const { getAlumniProfile } = require("./src/triggers/http/getAlumniProfile");
 
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
@@ -43,6 +44,7 @@ exports.registerStaff = registerStaff;
 exports.verifyStaff = verifyStaff;
 exports.getAllStaffVerification = getAllStaffVerification;
 
+exports.getAlumniProfile = getAlumniProfile;
 
 exports.submitDocumentRequest = submitDocumentRequest;
 exports.getColleges    = getColleges;
