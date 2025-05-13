@@ -28,6 +28,7 @@ const { getSponsorPerks   } = require('./src/triggers/http/getSponsorPerks');
 
 const { getAlumniProfile } = require("./src/triggers/http/getAlumniProfile");
 const { loginAlumni } = require('./src/triggers/http/loginAlumni');
+const { getSidebarUser } = require('./src/triggers/http/getSidebarUser');
 
 
 // Export Auth Triggers
@@ -54,6 +55,7 @@ exports.getDepartments = getDepartments;
 exports.loginAlumni = loginAlumni;
 
 
+exports.getSidebarUser = getSidebarUser;
 exports.getSponsorPerks = getSponsorPerks;
 
 
