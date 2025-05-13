@@ -2,7 +2,6 @@ const functions = require("firebase-functions");
 const cors = require("cors")({ origin: true });
 const { Pool } = require("pg");
 
-// PostgreSQL config
 const pool = new Pool({
   user: 'neondb_owner',
   host: 'ep-old-wind-a1kkjbku-pooler.ap-southeast-1.aws.neon.tech',
@@ -12,12 +11,12 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-// ✅ GET Sponsors and Perks
+// ✅ GET Sponsors and their perks
 exports.getSponsors = functions.https.onRequest((req, res) => {
-  return cors(req, res, async () => {
+  cors(req, res, async () => {
     try {
       const result = await pool.query(`
-        SELECT s.sponsor_id, s.name, sp.perk, sp.sponsor_perks_id
+        SELECT s.sponsor_id, s.name, s.photo_url, sp.perk, sp.sponsor_perks_id
         FROM "Sponsors" s
         LEFT JOIN "Sponsor_Perks" sp ON s.sponsor_id = sp.sponsor_id
         ORDER BY s.sponsor_id
@@ -30,6 +29,7 @@ exports.getSponsors = functions.https.onRequest((req, res) => {
           sponsorsMap.set(row.sponsor_id, {
             id: row.sponsor_id,
             name: row.name,
+            photoUrl: row.photo_url,
             perks: [],
           });
         }
@@ -50,38 +50,35 @@ exports.getSponsors = functions.https.onRequest((req, res) => {
   });
 });
 
-// ✅ POST New Sponsor
+// ✅ POST Sponsor with imageKey (string)
 exports.addSponsor = functions.https.onRequest((req, res) => {
-  return cors(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).send("Method Not Allowed");
-    }
+  cors(req, res, async () => {
+    const { name, perks, imageKey } = req.body;
 
-    const { name, perks } = req.body;
+    if (!name || !perks) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
 
     try {
       const sponsorResult = await pool.query(`SELECT nextval('sponsor_id_seq')`);
       const sponsor_id = `SP${sponsorResult.rows[0].nextval.toString().padStart(3, '0')}`;
 
       await pool.query(
-        `INSERT INTO "Sponsors" (sponsor_id, name) VALUES ($1, $2)`,
-        [sponsor_id, name]
+        `INSERT INTO "Sponsors" (sponsor_id, name, photo_url) VALUES ($1, $2, $3)`,
+        [sponsor_id, name, imageKey || null]
       );
 
-      for (const perk of perks) {
+      const parsedPerks = JSON.parse(perks);
+      for (const perk of parsedPerks) {
         const perkResult = await pool.query(`SELECT nextval('sponsor_perks_id_seq')`);
         const perk_id = `PERK${perkResult.rows[0].nextval.toString().padStart(3, '0')}`;
-
         await pool.query(
           `INSERT INTO "Sponsor_Perks" (sponsor_perks_id, perk, sponsor_id) VALUES ($1, $2, $3)`,
           [perk_id, perk, sponsor_id]
         );
       }
 
-      return res.status(201).json({
-        message: "Sponsor and perks added successfully",
-        sponsor_id,
-      });
+      return res.status(201).json({ message: "Sponsor added", sponsor_id });
     } catch (err) {
       console.error("Error adding sponsor:", err);
       return res.status(500).json({ error: err.message });
@@ -89,35 +86,35 @@ exports.addSponsor = functions.https.onRequest((req, res) => {
   });
 });
 
-// ✅ PUT Update Sponsor
+// ✅ PUT Sponsor with imageKey
 exports.updateSponsor = functions.https.onRequest((req, res) => {
-  return cors(req, res, async () => {
-    if (req.method !== "PUT") {
-      return res.status(405).send("Method Not Allowed");
-    }
-
+  cors(req, res, async () => {
     const sponsorId = req.query.id;
-    const { name, perks } = req.body;
+    const { name, perks, imageKey } = req.body;
 
-    if (!sponsorId || !name || !Array.isArray(perks)) {
+    if (!sponsorId || !name || !perks) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
     try {
-      await pool.query(
-        `UPDATE "Sponsors" SET name = $1 WHERE sponsor_id = $2`,
-        [name, sponsorId]
-      );
+      if (imageKey) {
+        await pool.query(
+          `UPDATE "Sponsors" SET name = $1, photo_url = $2 WHERE sponsor_id = $3`,
+          [name, imageKey, sponsorId]
+        );
+      } else {
+        await pool.query(
+          `UPDATE "Sponsors" SET name = $1 WHERE sponsor_id = $2`,
+          [name, sponsorId]
+        );
+      }
 
-      await pool.query(
-        `DELETE FROM "Sponsor_Perks" WHERE sponsor_id = $1`,
-        [sponsorId]
-      );
+      await pool.query(`DELETE FROM "Sponsor_Perks" WHERE sponsor_id = $1`, [sponsorId]);
 
-      for (const perk of perks) {
+      const parsedPerks = JSON.parse(perks);
+      for (const perk of parsedPerks) {
         const perk_id_result = await pool.query("SELECT nextval('sponsor_perks_id_seq')");
         const perk_id = `PERK${perk_id_result.rows[0].nextval.toString().padStart(3, '0')}`;
-
         await pool.query(
           `INSERT INTO "Sponsor_Perks" (sponsor_perks_id, perk, sponsor_id) VALUES ($1, $2, $3)`,
           [perk_id, perk.perk, sponsorId]
@@ -132,29 +129,22 @@ exports.updateSponsor = functions.https.onRequest((req, res) => {
   });
 });
 
+// ✅ DELETE Sponsor
 exports.deleteSponsor = functions.https.onRequest((req, res) => {
-    return cors(req, res, async () => {
-      if (req.method !== "DELETE") {
-        return res.status(405).send("Method Not Allowed");
-      }
-  
-      const sponsorId = req.query.id;
-      if (!sponsorId) {
-        return res.status(400).json({ error: "Missing sponsor ID" });
-      }
-  
-      try {
-        // Delete related perks first
-        await pool.query(`DELETE FROM "Sponsor_Perks" WHERE sponsor_id = $1`, [sponsorId]);
-  
-        // Then delete the sponsor
-        await pool.query(`DELETE FROM "Sponsors" WHERE sponsor_id = $1`, [sponsorId]);
-  
-        return res.status(200).json({ message: "Sponsor deleted successfully." });
-      } catch (err) {
-        console.error("Error deleting sponsor:", err);
-        return res.status(500).json({ error: "Internal server error" });
-      }
-    });
+  cors(req, res, async () => {
+    const sponsorId = req.query.id;
+    if (!sponsorId) {
+      return res.status(400).json({ error: "Missing sponsor ID" });
+    }
+
+    try {
+      await pool.query(`DELETE FROM "Sponsor_Perks" WHERE sponsor_id = $1`, [sponsorId]);
+      await pool.query(`DELETE FROM "Sponsors" WHERE sponsor_id = $1`, [sponsorId]);
+
+      return res.status(200).json({ message: "Sponsor deleted successfully." });
+    } catch (err) {
+      console.error("Error deleting sponsor:", err);
+      return res.status(500).json({ error: "Internal server error" });
+    }
   });
-  
+});

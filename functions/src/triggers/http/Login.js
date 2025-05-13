@@ -165,3 +165,52 @@ exports.getUserProfile = functions.https.onRequest((req, res) => {
       }
     });
   });
+
+  exports.updateAdminProfile = functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+      if (req.method !== "POST") {
+        return res.status(405).json({ error: "Method Not Allowed" })
+      }
+  
+      const {
+        user_id,
+        first_name,
+        middle_name,
+        last_name,
+        gender,
+        email,
+        photo_url,
+      } = req.body
+  
+      if (!user_id) {
+        return res.status(400).json({ error: "Missing user_id" })
+      }
+  
+      try {
+        // Update User_Profile
+        await pool.query(
+          `UPDATE "User_Profile"
+           SET first_name = $1,
+               middle_name = $2,
+               last_name = $3,
+               gender = $4
+           WHERE user_id = $5`,
+          [first_name, middle_name, last_name, gender, user_id]
+        )
+  
+        // Update User table
+        await pool.query(
+          `UPDATE "User"
+           SET email = $1,
+               photo_url = $2
+           WHERE user_id = $3`,
+          [email, photo_url, user_id]
+        )
+  
+        return res.json({ message: "Profile updated successfully" })
+      } catch (err) {
+        console.error("🔥 Update error:", err)
+        return res.status(500).json({ error: "Internal server error" })
+      }
+    })
+  })

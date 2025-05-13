@@ -14,7 +14,7 @@ const { registerApplicant } = require('./src/triggers/http/registerApplicant');
 const { loginStudent } = require('./src/triggers/http/loginStudent');
 
 //VerifyAdmin getAdminProfile
-const { verifyAdmin } = require("./src/triggers/http/Login");
+const { verifyAdmin, updateAdminProfile } = require("./src/triggers/http/Login");
 const { getUserProfile } = require("./src/triggers/http/Login");
 const { getAdminProfile } = require("./src/triggers/http/Login");
 
@@ -25,7 +25,7 @@ const { updateSponsor } = require("./src/triggers/http/sponsors");
 const { deleteSponsor } = require("./src/triggers/http/sponsors");
 
 //AlumniInfo 
-const { getAlumniList } = require("./src/triggers/http/AlumniInfo");
+const { getAlumniList, updateAlumni } = require("./src/triggers/http/AlumniInfo");
 const { getAlumniCardApplications } = require("./src/triggers/http/AlumniInfo");
 
 //Announcements Functions CHAP4-AR-ADMIN
@@ -64,7 +64,8 @@ exports.getAllStaffVerification = getAllStaffVerification;
 
 exports.verifyAdmin = verifyAdmin;
 exports.getUserProfile = getUserProfile;
-exports.getAdminProfile = getAdminProfile
+exports.getAdminProfile = getAdminProfile;
+exports.updateAdminProfile = updateAdminProfile;
 
 exports.getSponsors = getSponsors;
 exports.addSponsor = addSponsor;
@@ -73,6 +74,7 @@ exports.deleteSponsor = deleteSponsor;
 
 exports.getAlumniList = getAlumniList;
 exports.getAlumniCardApplications = getAlumniCardApplications;
+exports.updateAlumni = updateAlumni;
 
 exports.getAnnouncements = getAnnouncements;
 exports.deleteAnnouncements = deleteAnnouncements;
