@@ -15,12 +15,16 @@ const function_region = 'asia-southeast1';
 
 // Initialize Services
 const auth = admin.auth();
+const db = admin.firestore();
 
-functionV2.setGlobalOptions({ function_region });
+// Set global options for v2 functions
+functions_v2.setGlobalOptions({ region: function_region });
 
 module.exports = {
   admin,
   auth,
+  db,
   functions_v1: functions_v1.region(function_region),
   functions_v2,
+  function_region
 };
