@@ -18,6 +18,7 @@ const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
 const { verifyStaff } = require("./src/triggers/http/verifyStaff");
 const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVerification");
+const { generateStudentScheduleData } = require("./src/triggers/http/generateStudentScheduleData");
 
 //EVALUATION
 const { saveEvaluationForm } = require("./src/triggers/http/saveEvaluationForm");
@@ -44,6 +45,7 @@ exports.saveEvaluationForm = saveEvaluationForm;
 exports.getEvaluationForm = getEvaluationForm;
 exports.submitEvaluationResponse = submitEvaluationResponse;
 exports.getUniversityByAdmin = getUniversityByAdmin;
+exports.generateStudentScheduleData = generateStudentScheduleData;
 
 // You can add more functions as you develop them
 // Example:
