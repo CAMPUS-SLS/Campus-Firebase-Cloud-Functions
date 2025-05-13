@@ -29,7 +29,11 @@ const { updateAnnouncement } = require("./src/triggers/http/announcements");
 const { archiveAnnouncement } = require("./src/triggers/http/announcements");
 
 //DocumentRequest
-const { getDocumentRequests } = require("./src/triggers/http/documentrequest");
+const {
+  getDocumentRequests,
+  deleteDocumentRequests,
+  updateDocumentRequestStatus
+} = require("./src/triggers/http/documentrequest");
 
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
@@ -67,6 +71,8 @@ exports.updateAnnouncement = updateAnnouncement;
 exports.archiveAnnouncement = archiveAnnouncement;
 
 exports.getDocumentRequests = getDocumentRequests;
+exports.deleteDocumentRequests = deleteDocumentRequests;
+exports.updateDocumentRequestStatus = updateDocumentRequestStatus;
 
 // You can add more functions as you develop them
 // Example:
