@@ -17,7 +17,7 @@ exports.getDropdownInfo = functions.https.onRequest(async (req, res) => {
       return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { getDepartment, getCourses, getSection } = req.body;
+    const { getDepartment, getCourses, getSection, getRoom } = req.body;
 
     let query
 
@@ -29,6 +29,9 @@ exports.getDropdownInfo = functions.https.onRequest(async (req, res) => {
     `
     } else if( getCourses ) {
         query = `SELECT * FROM "Courses"
+    `
+    } else if( getRoom ) {
+        query = `SELECT * FROM "Room"
     `
     } 
 
