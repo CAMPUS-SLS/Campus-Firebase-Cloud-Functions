@@ -40,7 +40,8 @@ exports.getProfessorInfo = functions.https.onRequest(async (req, res) => {
         "Professor".employment_status,
         photo_url,
         email,
-        first_name ||' '|| last_name AS name
+        first_name ||' '|| last_name AS name,
+        5.0 AS rating
 
         FROM "Professor" 
         LEFT JOIN "User" ON "User".user_id = "Professor".user_id
