@@ -19,10 +19,6 @@ exports.getDropdownInfo = functions.https.onRequest(async (req, res) => {
 
     const { getDepartment, getCourses, getSection } = req.body;
 
-    if (!info) {
-      return res.status(400).json({ error: 'Missing values' });
-    }
-
     let query
 
     if( getDepartment ){
@@ -54,14 +50,13 @@ exports.getDropdownInfo = functions.https.onRequest(async (req, res) => {
 /*
 FRONTEND CODE SAMPLE
 
-fetch("https://asia-southeast1-campus-student-lifecycle.cloudfunctions.net/getCurriculum", {
+fetch("https://asia-southeast1-campus-student-lifecycle.cloudfunctions.net/getDropdownInfo", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
-    info: "CURR001",
-    getCourses: true // 
+   getDepartment:true // 
   })
 })
 .then(response => response.json())
