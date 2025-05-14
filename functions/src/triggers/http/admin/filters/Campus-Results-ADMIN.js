@@ -1,24 +1,23 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
+const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const pool = require('../../../../config/db-config');
+// const admin = require('firebase-admin'); // admin SDK not used directly for auth check in v2 onCall with appCheck: true or admin check
 
 /**
  * Get campus results with optional filtering
- * @param {Object} data - The request data containing filter criteria
- * @param {Object} context - The function context
+ * @param {Object} request - The request object containing data and auth context
  * @returns {Promise<Object>} - Filtered campus results data
  */
-const getCampusResults = async (data, context) => {
+exports.getCampusResults = onCall({ region: 'asia-southeast1', cors: true }, async (request) => {
     try {
         // Verify admin authentication
-        if (!context.auth || !context.auth.token.admin) {
-            throw new functions.https.HttpsError(
+        if (!request.auth || !request.auth.token.admin) {
+            throw new HttpsError(
                 'permission-denied',
                 'Only administrators can access this function'
             );
         }
 
-        const { filterCriteria } = data;
+        const { filterCriteria } = request.data;
         let query = `
             SELECT 
                 id,
@@ -80,17 +79,18 @@ const getCampusResults = async (data, context) => {
         };
     } catch (error) {
         console.error('Error in getCampusResults:', error);
-        throw new functions.https.HttpsError(
+        if (error instanceof HttpsError) {
+            throw error;
+        }
+        throw new HttpsError(
             'internal',
             'An error occurred while retrieving campus results',
             {
                 originalError: error.message,
-                stack: error.stack
+                // stack: error.stack // Consider if stack trace should be sent to client
             }
         );
     }
-};
+});
 
-module.exports = {
-    getCampusResults
-}; 
+// module.exports removed as we are using direct exports.getCampusResults 
