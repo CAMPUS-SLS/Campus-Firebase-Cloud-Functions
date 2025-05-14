@@ -11,17 +11,47 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-// Function to generate a random hex color with medium brightness
+// Function to generate a random darker pastel hex color
 const generateRandomColor = () => {
-  const randomChannel = () => Math.floor(Math.random() * 156) + 50; // Ensures values between 50 and 205
+  const randomChannel = () => Math.floor(Math.random() * 100) + 100; // Ensures values between 100 and 200 for darker pastel colors
   const r = randomChannel();
   const g = randomChannel();
   const b = randomChannel();
   return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`; // Convert to hex
 };
 
+const convertTo12HourFormat = (time) => {
+  try {
+    if (!time || typeof time !== "string") {
+      console.warn("Invalid time format:", time);
+      return "Invalid Time"; // Fallback for invalid time
+    }
+
+    // Split the time string into hours, minutes, and seconds
+    const [hours, minutes, seconds] = time.split(":");
+    if (isNaN(hours) || isNaN(minutes)) {
+      console.warn("Invalid time components:", time);
+      return "Invalid Time"; // Fallback for invalid time components
+    }
+
+    // Create a new Date object and set the time
+    const date = new Date();
+    date.setHours(parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds || 0, 10));
+
+    // Format the time to 12-hour format with AM/PM
+    return date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch (error) {
+    console.error("Error converting time:", error);
+    return "Invalid Time"; // Fallback for unexpected errors
+  }
+};
+
 exports.generateStudentScheduleData = functions.https.onRequest(async (req, res) => {
   cors(req, res, async () => {
+    console.log("Received user_id:", req.query.user_id); // Log the user_id
     if (req.method !== 'GET') {
       return res.status(405).json({ error: 'Method Not Allowed' });
     }
@@ -35,8 +65,8 @@ exports.generateStudentScheduleData = functions.https.onRequest(async (req, res)
         c.lab_units,
         s.section_desc AS section,
         t.weekday AS day,
-        t.timeslot_start AS startTime,
-        t.timeslot_end AS endTime,
+        t.timeslot_start AS starttime,
+        t.timeslot_end AS endtime,
         rm.floor_no || ' ' || rm.building AS location,
         rm.room_no AS room,
         CONCAT(up.last_name, ', ', up.first_name) AS instructor
@@ -73,21 +103,11 @@ exports.generateStudentScheduleData = functions.https.onRequest(async (req, res)
 
     try {
       const { rows } = await pool.query(query);
+      console.log("Query result rows:", rows); // Log the entire rows array
       const { acadyearterm } = await pool.query(enrollmentQuery);
 
       // Transform the data into the desired format
       const transformedData = rows.reduce((acc, row, index) => {
-        // Helper function to convert time to 12-hour format with AM/PM
-        const convertTo12HourFormat = (time) => {
-          const [hours, minutes] = time.split(':');
-          const date = new Date();
-          date.setHours(parseInt(hours, 10), parseInt(minutes, 10));
-          return date.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-          });
-        };
-
         // Check if the subject already exists in the accumulator
         let subject = acc.find(item => item.subject_code === row.subject_code);
 
@@ -110,8 +130,8 @@ exports.generateStudentScheduleData = functions.https.onRequest(async (req, res)
         // Add the schedule entry
         subject.schedules.push({
           day: row.day,
-          startTime: convertTo12HourFormat(row.startTime), // Convert startTime
-          endTime: convertTo12HourFormat(row.endTime), // Convert endTime
+          startTime: row.starttime, // Use raw starttime from the database
+          endTime: row.endtime,     // Use raw endtime from the database
           room: row.room,
           instructor: row.instructor,
         });
@@ -128,35 +148,3 @@ exports.generateStudentScheduleData = functions.https.onRequest(async (req, res)
 });
 
 
-/* 
-    SELECT
-    u.user_id,
-    c.course_id AS subject_code,
-    c.course_title AS subject_desc,
-    c.lec_units,
-    c.lab_units,
-    s.section_desc AS section,
-    t.weekday AS day,
-    t.timeslot_start AS startTime,
-    t.timeslot_end AS endTime,
-    rm.floor_no || ' ' || rm.building AS location,
-    rm.room_no AS room,
-    CONCAT(up.last_name, ', ', up.first_name) AS instructor
-    
-    FROM
-    "Course" c
-    JOIN
-    "Timeslot" t ON c.course_id = t.course_id
-    JOIN
-    "Section" s ON t.section_id = s.section_id
-    JOIN
-    "Room" rm ON t.room_id = rm.room_id
-    JOIN
-    "Professor" p ON t.professor_id = p.professor_id
-    JOIN
-    "User_Profile" up ON p.user_id = up.user_id
-    JOIN 
-    "Student" st ON s.section_id = st.section_id
-    JOIN 
-    "User" u ON st.user_id = u.user_id;
-*/
