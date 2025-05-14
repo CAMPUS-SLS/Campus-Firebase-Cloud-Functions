@@ -80,114 +80,101 @@ exports.getAlumniCardApplications = functions.https.onRequest((req, res) => {
 });
 
 exports.updateAlumni = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).send("Method Not Allowed");
-    }
+  try {
+    console.log("🔥 updateAlumni ENTRY");
 
-    const {
-      user_id,
-      firstName,
-      middleName,
-      lastName,
-      auxiliaryName,
-      gender,
-      birthday,
-      birthplace,
-      nationality,
-      civilStatus,
-      mobileNumber,
-      telNo,
-      email,
-      altEmail,
-      facebookId,
-      linkedinId,
-      profileImage,
-    } = req.body;
-
-    console.log("Received user_id:", user_id);
-    console.log("Full body:", req.body);
-
-    const client = await pool.connect();
-
-    try {
-      await client.query("BEGIN");
-
-      // Update User table
-      await client.query(
-        `
-        UPDATE "User"
-        SET 
-          email = $1,
-          photo_url = $2
-        WHERE user_id = $3
-        `,
-        [email, profileImage, user_id]
-      );
-
-      // Update User_Profile table
-      await client.query(
-        `
-        UPDATE "User_Profile"
-        SET 
-          first_name = $1,
-          middle_name = $2,
-          last_name = $3,
-          auxillary_name = $4,
-          gender = $5,
-          birth_date = $6,
-          nationality = $7
-        WHERE user_id = $8
-        `,
-        [
+    cors(req, res, async () => {
+      try {
+        const {
+          user_id,
           firstName,
           middleName,
           lastName,
           auxiliaryName,
           gender,
           birthday,
-          nationality,
-          user_id,
-        ]
-      );
-
-      // Update Alumni_Profiles table
-      await client.query(
-        `
-        UPDATE "Alumni_Profiles"
-        SET 
-          birth_place = $1,
-          civil_status = $2,
-          mobile_no = $3,
-          telephone_no = $4,
-          alt_email = $5,
-          facebook_id = $6,
-          linkedin_url = $7,
-          photo_url = $8,
-          last_updated = CURRENT_DATE
-        WHERE user_id = $9
-        `,
-        [
           birthplace,
+          nationality,
           civilStatus,
           mobileNumber,
           telNo,
+          email,
           altEmail,
           facebookId,
           linkedinId,
-          profileImage,
-          user_id,
-        ]
-      );
+          photo_url
+        } = req.body;
 
-      await client.query("COMMIT");
-      return res.status(200).json({ message: "Alumni data updated successfully" });
-    } catch (error) {
-      await client.query("ROLLBACK");
-      console.error("Update failed:", error);
-      return res.status(500).json({ error: "Update failed", details: error.message });
-    } finally {
-      client.release();
-    }
-  });
+        if (!user_id) {
+          console.log("❌ Missing user_id");
+          return res.status(400).send("Missing user_id");
+        }
+
+        console.log("📦 Payload:", req.body);
+
+        await pool.query(
+          `UPDATE "User"
+           SET photo_url = $1
+           WHERE user_id = $2`,
+          [photo_url, user_id]
+        );
+
+        await pool.query(
+          `UPDATE "Alumni_Profiles"
+           SET photo_url = $1,
+               student_number = student_number,
+               birth_place = $2,
+               civil_status = $3,
+               mobile_no = $4,
+               telephone_no = $5,
+               alt_email = $6,
+               linkedin_url = $7,
+               facebook_id = $8
+           WHERE user_id = $9`,
+          [
+            photo_url,
+            birthplace,
+            civilStatus,
+            mobileNumber,
+            telNo,
+            altEmail,
+            linkedinId,
+            facebookId,
+            user_id,
+          ]
+        );
+
+        await pool.query(
+          `UPDATE "User_Profile"
+           SET first_name = $1,
+               middle_name = $2,
+               last_name = $3,
+               auxillary_name = $4,
+               gender = $5,
+               birth_date = $6,
+               nationality = $7
+           WHERE user_id = $8`,
+          [
+            firstName,
+            middleName,
+            lastName,
+            auxiliaryName,
+            gender,
+            birthday,
+            nationality,
+            user_id,
+          ]
+        );
+
+        console.log("✅ Update successful");
+        res.status(200).send("Alumni profile updated successfully.");
+      } catch (innerErr) {
+        console.error("🔥 Inner error:", innerErr);
+        res.status(500).send("Internal server error.");
+      }
+    });
+  } catch (outerErr) {
+    console.error("🔥 Outer crash before cors:", outerErr);
+    res.status(500).send("Fatal server error.");
+  }
 });

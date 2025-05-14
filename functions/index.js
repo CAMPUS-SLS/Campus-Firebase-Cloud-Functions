@@ -24,9 +24,12 @@ const { addSponsor } = require("./src/triggers/http/sponsors");
 const { updateSponsor } = require("./src/triggers/http/sponsors");
 const { deleteSponsor } = require("./src/triggers/http/sponsors");
 
-//AlumniInfo 
+//AlumniInfo exports.getAlumniCardApplicationDetail
 const { getAlumniList, updateAlumni } = require("./src/triggers/http/AlumniInfo");
 const { getAlumniCardApplications } = require("./src/triggers/http/AlumniInfo");
+const { getAlumniCardApplicationDetail, savePhotoUrl } = require("./src/triggers/http/alumnicard");
+const { updateAlumniCardStatus } = require("./src/triggers/http/alumnicard");
+const { saveTestPhotoUrl } = require("./src/triggers/http/alumnicard");
 
 //Announcements Functions CHAP4-AR-ADMIN
 const { getAnnouncements } = require("./src/triggers/http/announcements");
@@ -41,7 +44,8 @@ const { archiveAnnouncement } = require("./src/triggers/http/announcements");
 const {
   getDocumentRequests,
   deleteDocumentRequests,
-  updateDocumentRequestStatus
+  updateDocumentRequestStatus,
+  getDocumentRequestDetail
 } = require("./src/triggers/http/documentrequest");
 
 //AUTH FOR STAFF
@@ -79,6 +83,8 @@ exports.deleteSponsor = deleteSponsor;
 exports.getAlumniList = getAlumniList;
 exports.getAlumniCardApplications = getAlumniCardApplications;
 exports.updateAlumni = updateAlumni;
+exports.getAlumniCardApplicationDetail = getAlumniCardApplicationDetail;  
+exports.updateAlumniCardStatus = updateAlumniCardStatus;
 
 exports.getAnnouncements = getAnnouncements;
 exports.deleteAnnouncements = deleteAnnouncements;
@@ -91,6 +97,9 @@ exports.archiveAnnouncement = archiveAnnouncement;
 exports.getDocumentRequests = getDocumentRequests;
 exports.deleteDocumentRequests = deleteDocumentRequests;
 exports.updateDocumentRequestStatus = updateDocumentRequestStatus;
+exports.getDocumentRequestDetail = getDocumentRequestDetail;
+
+exports.saveTestPhotoUrl = saveTestPhotoUrl;
 
 // You can add more functions as you develop them
 // Example:
