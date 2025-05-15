@@ -38,7 +38,7 @@ exports.getDocumentRequests = functions.https.onRequest((req, res) => {
         JOIN "User" u ON dr."user_id" = u."user_id"
         JOIN "User_Profile" up ON u."user_id" = up."user_id"
         JOIN "Department" d ON dr."department_id" = d."department_id"
-        JOIN "Alumni_Payment" ap 
+        LEFT JOIN "Alumni_Payment" ap 
           ON ap."user_id" = u."user_id"
           AND ap."type" = 'Document Request'
       `);
