@@ -181,53 +181,24 @@ exports.updateAlumniCardStatus = functions.https.onRequest((req, res) => {
 // ✅ Save test photo URL
 exports.saveTestPhotoUrl = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    const { user_id, photo_url } = req.body;
+    const { user_id, graduation_photo } = req.body;
 
-    if (!user_id || !photo_url) {
-      return res.status(400).send("Missing user_id or photo_url.");
+    if (!user_id || !graduation_photo) {
+      return res.status(400).send("Missing user_id or graduation_photo.");
     }
 
     try {
-      await pool.query(
-        `UPDATE "User"
-         SET photo_url = $1
-         WHERE user_id = $2`,
-        [photo_url, user_id]
-      );
+      const query = `
+        UPDATE "Alumni_Card_Application"
+        SET graduation_photo = $1
+        WHERE user_id = $2
+      `;
+      await pool.query(query, [graduation_photo, user_id]);
 
-      res.status(200).send("Photo URL updated successfully.");
+      res.status(200).send("graduation_photo updated successfully.");
     } catch (err) {
-      console.error("Error updating photo_url:", err);
+      console.error("Error updating graduation_photo:", err);
       res.status(500).send("Database error.");
-    }
-  });
-});
-
-// ✅ DELETE multiple alumni card applications
-exports.deleteAlumniCardApplications = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).json({ message: "Method Not Allowed" });
-    }
-
-    const { ids } = req.body;
-
-    if (!Array.isArray(ids) || ids.length === 0) {
-      return res.status(400).json({ message: "No application IDs provided" });
-    }
-
-    try {
-      const placeholders = ids.map((_, i) => `$${i + 1}`).join(",");
-      await pool.query(
-        `DELETE FROM "Alumni_Card_Application"
-         WHERE "alumni_card_application_id" IN (${placeholders})`,
-        ids
-      );
-
-      res.status(200).json({ message: "Alumni card applications deleted successfully" });
-    } catch (error) {
-      console.error("❌ Error deleting applications:", error.message);
-      res.status(500).json({ message: "Internal Server Error", details: error.message });
     }
   });
 });
