@@ -55,17 +55,7 @@ exports.insertPersonalInfo = functions.https.onRequest((req, res) => {
       });
       await db.connect();
 
-      // 4. Check if user exists in Student_Applicant table
-      const applicantRes = await db.query(
-        `SELECT applicant_id FROM "Student_Applicant" WHERE user_id = $1 LIMIT 1`,
-        [uid]
-      );
-      if (applicantRes.rowCount === 0) {
-        await db.end();
-        return res.status(400).json({ message: 'No Student_Applicant record found for this user.' });
-      }
-
-      // 5. Insert into personal_information
+      // 4. Insert into personal_information
       const insertQuery = `
         INSERT INTO "personal_information" (
           family_name,
@@ -116,22 +106,14 @@ exports.insertPersonalInfo = functions.https.onRequest((req, res) => {
       const { rows } = await db.query(insertQuery, values);
       const recordId = rows[0].id;
 
-      // 6. Create Student record
-      const student_id = `stu_${uid.slice(0, 8)}`;
-      await db.query(
-        `INSERT INTO "Student" (student_id, user_id) VALUES ($1, $2)`,
-        [student_id, uid]
-      );
-
       await db.end();
 
-      // 7. (Optional) add custom claim or other post-insert logic
+      // 5. (Optional) add custom claim or other post-insert logic
       // e.g. await admin.auth().setCustomUserClaims(uid, { personalInfoId: recordId });
 
       return res.status(200).json({
         message: 'Personal information saved successfully',
-        recordId,
-        student_id
+        recordId
       });
 
     } catch (err) {
