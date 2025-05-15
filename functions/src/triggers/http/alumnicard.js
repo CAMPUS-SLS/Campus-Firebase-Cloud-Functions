@@ -193,25 +193,25 @@ exports.updateAlumniCardStatus = functions.https.onRequest((req, res) => {
 });
 
 exports.saveTestPhotoUrl = functions.https.onRequest((req, res) => {
-    cors(req, res, async () => {
-      const { user_id, photo_url } = req.body;
-  
-      if (!user_id || !photo_url) {
-        return res.status(400).send("Missing user_id or photo_url.");
-      }
-  
-      try {
-        const query = `
-          UPDATE "User"
-          SET photo_url = $1
-          WHERE user_id = $2
-        `;
-        await pool.query(query, [photo_url, user_id]);
-  
-        res.status(200).send("Photo URL updated successfully.");
-      } catch (err) {
-        console.error("Error updating photo_url:", err);
-        res.status(500).send("Database error.");
-      }
-    });
+  cors(req, res, async () => {
+    const { user_id, graduation_photo } = req.body;
+
+    if (!user_id || !graduation_photo) {
+      return res.status(400).send("Missing user_id or graduation_photo.");
+    }
+
+    try {
+      const query = `
+        UPDATE "Alumni_Card_Application"
+        SET graduation_photo = $1
+        WHERE user_id = $2
+      `;
+      await pool.query(query, [graduation_photo, user_id]);
+
+      res.status(200).send("graduation_photo updated successfully.");
+    } catch (err) {
+      console.error("Error updating graduation_photo:", err);
+      res.status(500).send("Database error.");
+    }
   });
+});
