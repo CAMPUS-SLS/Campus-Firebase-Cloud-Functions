@@ -12,7 +12,7 @@
 //REGISTER APPLICANT HTTP
 const { registerApplicant } = require('./src/triggers/http/registerApplicant');
 const { loginStudent } = require('./src/triggers/http/loginStudent');
-
+const { insertPersonalInfo } = require('./src/triggers/http/insertPersonalInfo'); // Added our new function
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
@@ -36,7 +36,7 @@ const { getFacultyListForStudent } = require("./src/triggers/http/getFacultyList
 exports.registerApplicant = registerApplicant;
 //exports.verifyReferenceNumber = require('./triggers/http/verifyReferenceNumber').verifyReferenceNumber;
 exports.loginStudent = loginStudent; 
-
+exports.insertPersonalInfo = insertPersonalInfo; // Added our new function export
 
 exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
