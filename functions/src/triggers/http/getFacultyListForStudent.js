@@ -37,23 +37,22 @@ exports.getFacultyListForStudent = functions.https.onRequest((req, res) => {
       // 🔍 Fetch professors the student has NOT yet evaluated for the current term
       const facultyRes = await db.query(
         `
-        SELECT 
-          pl.prof_load_id,
-          c.course_title,
-          CONCAT(up.first_name, ' ', up.last_name) AS professor_name
-        FROM "Professor_Load" pl
-        JOIN "Course" c ON c.course_id = pl.course_id
-        JOIN "Professor" pr ON pr.professor_id = pl.professor_id
-        JOIN "User_Profile" up ON up.user_id = pr.user_id
-        LEFT JOIN "Student_Prof_Track" sp ON 
-          sp.student_id = $1 AND 
-          sp.prof_load_id = pl.prof_load_id AND 
-          sp.status = 'Submitted'
-        WHERE 
-          pl.section_id = $2
-          AND pl.academic_year = $3
-          AND pl.academic_term = $4
-          AND sp.sp_track_id IS NULL
+       SELECT 
+        pl.prof_load_id,
+        c.course_title,
+        CONCAT(up.first_name, ' ', up.last_name) AS professor_name,
+        sp.status -- optional: can help you show 'Pending' / 'Submitted'
+      FROM "Professor_Load" pl
+      JOIN "Course" c ON c.course_id = pl.course_id
+      JOIN "Professor" pr ON pr.professor_id = pl.professor_id
+      JOIN "User_Profile" up ON up.user_id = pr.user_id
+      LEFT JOIN "Student_Prof_Track" sp 
+        ON sp.student_id = $1 AND sp.prof_load_id = pl.prof_load_id
+      WHERE 
+        pl.section_id = $2
+        AND pl.academic_year = $3
+        AND pl.academic_term = $4
+
         `,
         [student_id, section_id, academicYear, academicTerm]
       );
