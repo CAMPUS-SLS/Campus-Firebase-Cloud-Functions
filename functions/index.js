@@ -49,6 +49,10 @@ const {
   getDocumentRequestDetail
 } = require("./src/triggers/http/documentrequest");
 
+//Feedback
+const { getFeedback } = require("./src/triggers/http/alumnifeedback");
+const { getFeedbackById } = require("./src/triggers/http/alumnifeedback");
+
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
@@ -101,7 +105,11 @@ exports.deleteDocumentRequests = deleteDocumentRequests;
 exports.updateDocumentRequestStatus = updateDocumentRequestStatus;
 exports.getDocumentRequestDetail = getDocumentRequestDetail;
 
+exports.getFeedback = getFeedback;
+exports.getFeedbackById = getFeedbackById;
+
 exports.saveTestPhotoUrl = saveTestPhotoUrl;
+
 
 // You can add more functions as you develop them
 // Example:
