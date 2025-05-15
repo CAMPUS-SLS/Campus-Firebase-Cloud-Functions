@@ -105,7 +105,7 @@ exports.updateDocumentRequestStatus = functions.https.onRequest((req, res) => {
       return res.status(405).json({ message: "Method Not Allowed" });
     }
 
-    const { doc_request_id, new_status } = req.body;
+    const { doc_request_id, new_status, comments } = req.body;
 
     if (!doc_request_id || !new_status) {
       return res.status(400).json({ message: "Missing doc_request_id or new_status" });
@@ -114,9 +114,9 @@ exports.updateDocumentRequestStatus = functions.https.onRequest((req, res) => {
     try {
       await pool.query(
         `UPDATE "Document_Requests"
-         SET "status" = $1
-         WHERE "doc_request_id" = $2`,
-        [new_status, doc_request_id]
+         SET "status" = $1, "admin_comments" = $2
+         WHERE "doc_request_id" = $3`,
+        [new_status, comments, doc_request_id]
       );
 
       res.status(200).json({ message: "Status updated successfully" });
