@@ -5,9 +5,6 @@ require("dotenv").config();
 
 exports.getEvaluationForm = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    const formId = req.query.formId;
-    if (!formId) return res.status(400).json({ message: "Missing formId" });
-
     const db = new Client({
       connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false },
@@ -16,15 +13,23 @@ exports.getEvaluationForm = functions.https.onRequest((req, res) => {
     try {
       await db.connect();
 
+      // 🔍 Fetch the most recently published form
       const formRes = await db.query(`
-        SELECT * FROM "Evaluation_Forms" WHERE "eval_form_id" = $1
-      `, [formId]);
+        SELECT * FROM "Evaluation_Forms"
+        WHERE date_published IS NOT NULL
+        ORDER BY date_published DESC
+        LIMIT 1
+      `);
+
       const form = formRes.rows[0];
-      if (!form) return res.status(404).json({ message: "Form not found" });
+      if (!form) {
+        await db.end();
+        return res.status(404).json({ message: "No published evaluation form found." });
+      }
 
       const sectionsRes = await db.query(`
         SELECT * FROM "Form_Sections" WHERE "eval_form_id" = $1 ORDER BY "sort_order"
-      `, [formId]);
+      `, [form.eval_form_id]);
       const sections = sectionsRes.rows;
 
       for (const section of sections) {

@@ -48,8 +48,8 @@ exports.saveEvaluationForm = functions.https.onRequest((req, res) => {
       await db.query(
         `
         INSERT INTO "Evaluation_Forms"
-        ("eval_form_id", "university_id", "instructions", "acad_year", "acad_term", "eval_period", "start_date", "end_date", "created_by", "date_created")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+        ("eval_form_id", "university_id", "instructions", "acad_year", "acad_term", "eval_period", "start_date", "end_date", "created_by", "date_created", "date_published")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
       `,
         [
           evalFormId,
@@ -60,9 +60,10 @@ exports.saveEvaluationForm = functions.https.onRequest((req, res) => {
           evaluationPeriod,
           startDate,
           endDate,
-          adminId, // ✅ use admin_id here
+          adminId,
         ]
       );
+      
 
       for (const [sIdx, section] of body.sections.entries()) {
         const sectionId = `sec_${uuidv4().slice(0, 12)}`;

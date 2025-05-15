@@ -25,6 +25,7 @@ const { saveEvaluationForm } = require("./src/triggers/http/saveEvaluationForm")
 const { getEvaluationForm } = require("./src/triggers/http/getEvaluationForm");
 const { submitEvaluationResponse } = require("./src/triggers/http/submitEvaluationResponse");
 const { getUniversityByAdmin } = require("./src/triggers/http/getUniversityByAdmin");
+const { getFacultyListForStudent } = require("./src/triggers/http/getFacultyListForStudent");
 
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
@@ -46,6 +47,7 @@ exports.getEvaluationForm = getEvaluationForm;
 exports.submitEvaluationResponse = submitEvaluationResponse;
 exports.getUniversityByAdmin = getUniversityByAdmin;
 exports.generateStudentScheduleData = generateStudentScheduleData;
+exports.getFacultyListForStudent = getFacultyListForStudent;
 
 // You can add more functions as you develop them
 // Example:
