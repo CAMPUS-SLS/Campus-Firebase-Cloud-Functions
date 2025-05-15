@@ -1,0 +1,45 @@
+const { Client } = require('pg');
+const functions = require('firebase-functions');
+const cors = require("cors")({ origin: true });
+require("dotenv").config();
+
+exports.removeSavedBooks = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+      
+      try {
+          const db = new Client({
+              connectionString: process.env.DATABASE_URL,
+              ssl: { rejectUnauthorized: false }
+            });
+            await db.connect();
+            
+        if (req.method !== "POST") {
+            return res.status(405).json({ message: "Method Not Allowed" });
+        }
+
+        const { UID, BookID } = req.body;
+        console.log("req.body: ", req.body);
+
+        if (!UID || !BookID) {
+            return res.status(400).json({ message: "UID and BookID are required" });
+        }
+
+        const deleteResult = await db.query(
+            `DELETE FROM "Saved_Books" WHERE user_id = $1 AND book_id = $2 RETURNING *`,
+            [UID, BookID]
+        );
+
+        await db.end();
+
+        if (deleteResult.rows.length === 0) {
+            return res.status(404).json({ message: "Book not found" });
+        }
+
+        return res.status(200).json({ message: "Book removed successfully", book: deleteResult.rows[0] });
+
+        } catch (err) {
+        console.error("Error removing book:", err);
+        return res.status(500).json({ message: "Server error: " + err.message });
+    }
+  });
+});

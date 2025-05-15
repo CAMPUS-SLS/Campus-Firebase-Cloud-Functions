@@ -19,7 +19,12 @@ const { registerStaff } = require("./src/triggers/http/registerStaff");
 const { verifyStaff } = require("./src/triggers/http/verifyStaff");
 const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVerification");
 const { generateStudentScheduleData } = require("./src/triggers/http/generateStudentScheduleData");
+
+//FOR LIBRARY
 const { getAllBooks } = require('./src/triggers/http/getAllBooks');
+const { addSavedBooks } = require('./src/triggers/http/addSavedBooks');
+const { removeSavedBooks } = require('./src/triggers/http/removeSavedBooks');
+const { getAllSavedBooks } = require('./src/triggers/http/getAllSavedBooks');
 
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
@@ -37,7 +42,12 @@ exports.registerStaff = registerStaff;
 exports.verifyStaff = verifyStaff;
 exports.getAllStaffVerification = getAllStaffVerification;
 exports.generateStudentScheduleData = generateStudentScheduleData;
+
+//FOR LIBRARY
 exports.getAllbooks = getAllBooks;
+exports.addSavedBooks = addSavedBooks;
+exports.removeSavedBooks = removeSavedBooks;
+exports.getAllSavedBooks = getAllSavedBooks;
 
 // You can add more functions as you develop them
 // Example:
