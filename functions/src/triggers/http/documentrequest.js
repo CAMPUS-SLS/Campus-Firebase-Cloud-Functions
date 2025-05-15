@@ -182,7 +182,7 @@ exports.getDocumentRequestDetail = functions.https.onRequest((req, res) => {
         batch: row.batch,
         reason: row.purpose,
         documentType: row.document_type,
-        requestDate: row.created_at,
+        requestDate: row.created_at ? new Date(row.created_at).toISOString() : null,
         status: row.status,
         collegeDept: row.department_name,
         program: row.program_desc,

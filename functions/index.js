@@ -49,6 +49,8 @@ const {
   getDocumentRequestDetail
 } = require("./src/triggers/http/documentrequest");
 
+const { registerAdmin } = require("./src/triggers/http/registerAdmin");
+
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
@@ -102,6 +104,7 @@ exports.updateDocumentRequestStatus = updateDocumentRequestStatus;
 exports.getDocumentRequestDetail = getDocumentRequestDetail;
 
 exports.saveTestPhotoUrl = saveTestPhotoUrl;
+exports.registerAdmin = registerAdmin;
 
 // You can add more functions as you develop them
 // Example:
