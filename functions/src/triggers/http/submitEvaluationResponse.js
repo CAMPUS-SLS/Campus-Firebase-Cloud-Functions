@@ -10,8 +10,9 @@ exports.submitEvaluationResponse = functions.https.onRequest((req, res) => {
       return res.status(405).json({ message: "Method Not Allowed" });
     }
 
-    const { studentId, formId, answers, profLoadId } = req.body;
-    if (!studentId || !formId || !answers) {
+    const { studentId: userId, evalFormId, profLoadId, answers } = req.body;
+
+    if (!userId || !evalFormId || !profLoadId || !answers) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -24,37 +25,132 @@ exports.submitEvaluationResponse = functions.https.onRequest((req, res) => {
       await db.connect();
       await db.query("BEGIN");
 
-      const evalResponseId = uuidv4();
+      // Resolve actual student_id from user_id
+      const studentRes = await db.query(
+        `SELECT student_id FROM "Student" WHERE user_id = $1`,
+        [userId]
+      );
 
-      await db.query(`
+      if (studentRes.rowCount === 0) {
+        throw new Error(`No student found for user_id: ${userId}`);
+      }
+
+      const studentId = studentRes.rows[0].student_id;
+
+      // Check if there's already a pending track
+      const trackRes = await db.query(
+        `SELECT sp_track_id FROM "Student_Prof_Track"
+         WHERE student_id = $1 AND prof_load_id = $2 AND status = 'Pending'`,
+        [studentId, profLoadId]
+      );
+
+      if (trackRes.rowCount === 0) {
+        throw new Error(`No pending evaluation record found for student ${studentId} and prof_load_id ${profLoadId}`);
+      }
+
+      const spTrackId = trackRes.rows[0].sp_track_id;
+
+      // Generate evaluation response ID
+      const evalResponseId = `er_${uuidv4().replace(/-/g, "").slice(0, 16)}`;
+
+      // Insert into Form_Responses
+      await db.query(
+        `
         INSERT INTO "Form_Responses"
-        ("eval_response_id", "eval_form_id", "student_id", "date_submitted")
+        (eval_response_id, eval_form_id, student_id, date_submitted)
         VALUES ($1, $2, $3, NOW())
-      `, [evalResponseId, formId, studentId]);
+        `,
+        [evalResponseId, evalFormId, studentId]
+      );
 
-      await db.query(`
-        INSERT INTO "Student_Prof_Track"
-        ("sp_track_id", "eval_response_id", "student_id", "prof_load_id", "status", "date_submitted")
-        VALUES ($1, $2, $3, $4, 'Submitted', NOW())
-      `, [uuidv4(), evalResponseId, studentId, profLoadId]);
+      // Update the existing Student_Prof_Track row
+      await db.query(
+        `
+        UPDATE "Student_Prof_Track"
+        SET eval_response_id = $1, status = 'Submitted', date_submitted = NOW()
+        WHERE sp_track_id = $2
+        `,
+        [evalResponseId, spTrackId]
+      );
 
-      for (const [questionId, answer] of Object.entries(answers)) {
-        await db.query(`
-          INSERT INTO "Question_Responses_Fact"
-          ("eval_response_id", "form_question_id", "answer_text")
-          VALUES ($1, $2, $3)
-        `, [evalResponseId, questionId, answer]);
+      // Save all answers
+      for (const response of answers) {
+        const {
+          formQuestionId,
+          questionType,
+          answerText,
+          rowLabel,
+          colLabel,
+        } = response;
+
+        console.log("📦 Inserting response:", {
+          evalResponseId,
+          formQuestionId,
+          questionType,
+          answerText,
+          rowLabel,
+          colLabel,
+        });
+
+        switch (questionType) {
+          case "checkboxes":
+            if (Array.isArray(answerText)) {
+              for (const option of answerText) {
+                await db.query(
+                  `INSERT INTO "Question_Responses_Fact"
+                   (eval_response_id, form_question_id, answer_text)
+                   VALUES ($1, $2, $3)`,
+                  [evalResponseId, formQuestionId, option]
+                );
+              }
+            }
+            break;
+
+          case "ranking":
+            if (Array.isArray(answerText)) {
+              for (const { option, rank } of answerText) {
+                await db.query(
+                  `INSERT INTO "Question_Responses_Fact"
+                   (eval_response_id, form_question_id, answer_text, col_label)
+                   VALUES ($1, $2, $3, $4)`,
+                  [evalResponseId, formQuestionId, option, rank.toString()]
+                );
+              }
+            }
+            break;
+
+          case "gridCheckbox":
+            if (Array.isArray(answerText)) {
+              for (const { row, col } of answerText) {
+                await db.query(
+                  `INSERT INTO "Question_Responses_Fact"
+                   (eval_response_id, form_question_id, row_label, col_label, answer_text)
+                   VALUES ($1, $2, $3, $4, 'Checked')`,
+                  [evalResponseId, formQuestionId, row, col]
+                );
+              }
+            }
+            break;
+
+          default:
+            await db.query(
+              `INSERT INTO "Question_Responses_Fact"
+               (eval_response_id, form_question_id, answer_text, row_label, col_label)
+               VALUES ($1, $2, $3, $4, $5)`,
+              [evalResponseId, formQuestionId, answerText || "", rowLabel || null, colLabel || null]
+            );
+        }
       }
 
       await db.query("COMMIT");
       await db.end();
 
-      return res.status(200).json({ success: true });
+      return res.status(200).json({ success: true, evalResponseId });
 
     } catch (err) {
       await db.query("ROLLBACK");
       await db.end();
-      console.error("Error in submitEvaluationResponse:", err);
+      console.error("❌ Error in submitEvaluationResponse:", err);
       return res.status(500).json({ success: false, message: err.message });
     }
   });

@@ -43,8 +43,8 @@ exports.saveEvaluationForm = functions.https.onRequest((req, res) => {
         throw new Error(`No matching admin_id found for user_id "${createdBy}"`);
       }
 
-      const evalFormId = `form_${uuidv4().slice(0, 12)}`;
-
+      const evalFormId = `form_${uuidv4().slice(0, 8)}`;
+      console.log({ evalResponseId, formId, studentId, profLoadId, answers });
       await db.query(
         `
         INSERT INTO "Evaluation_Forms"
@@ -66,7 +66,7 @@ exports.saveEvaluationForm = functions.https.onRequest((req, res) => {
       
 
       for (const [sIdx, section] of body.sections.entries()) {
-        const sectionId = `sec_${uuidv4().slice(0, 12)}`;
+        const sectionId = `sec_${uuidv4().slice(0, 8)}`;
 
         await db.query(
           `
