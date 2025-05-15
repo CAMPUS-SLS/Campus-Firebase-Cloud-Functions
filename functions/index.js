@@ -30,6 +30,7 @@ const { getAlumniCardApplications } = require("./src/triggers/http/AlumniInfo");
 const { getAlumniCardApplicationDetail, savePhotoUrl } = require("./src/triggers/http/alumnicard");
 const { updateAlumniCardStatus } = require("./src/triggers/http/alumnicard");
 const { saveTestPhotoUrl } = require("./src/triggers/http/alumnicard");
+const { deleteAlumniCardApplications } = require("./src/triggers/http/alumnicard");
 
 //Announcements Functions CHAP4-AR-ADMIN
 const { getAnnouncements } = require("./src/triggers/http/announcements");
@@ -85,6 +86,7 @@ exports.getAlumniCardApplications = getAlumniCardApplications;
 exports.updateAlumni = updateAlumni;
 exports.getAlumniCardApplicationDetail = getAlumniCardApplicationDetail;  
 exports.updateAlumniCardStatus = updateAlumniCardStatus;
+exports.deleteAlumniCardApplications = deleteAlumniCardApplications;
 
 exports.getAnnouncements = getAnnouncements;
 exports.deleteAnnouncements = deleteAnnouncements;

@@ -19,7 +19,7 @@
     "firebase-admin": "^12.6.0",
     "firebase-functions": "^6.0.1",
     "multer": "^1.4.5-lts.2",
-    "pg": "^8.15.6"
+    "pg": "^8.16.0"
   },
   "devDependencies": {
     "firebase-functions-test": "^3.1.0"
