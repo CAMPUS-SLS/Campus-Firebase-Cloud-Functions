@@ -1,59 +1,61 @@
-// functions/src/triggers/http/getSidebarUser.js
+const functions = require("firebase-functions");
+const cors = require("cors")({ origin: true });
+const admin = require("firebase-admin");
+const { Client } = require("pg");
 
-const functions = require('firebase-functions');
-const cors      = require('cors')({ origin: true });
-const { Client } = require('pg');
+if (!admin.apps.length) admin.initializeApp();
 
 exports.getSidebarUser = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    if (req.method !== 'GET') {
-      return res.status(405).json({ error: 'Method Not Allowed' });
-    }
-    const userId = req.query.userId;
-    if (!userId) {
-      return res.status(400).json({ error: 'userId query param is required' });
-    }
-
-    const db = new Client({
-      user:     'neondb_owner',
-      host:     'ep-old-wind-a1kkjbku-pooler.ap-southeast-1.aws.neon.tech',
-      database: 'neondb',
-      password: 'npg_mQOGqHwl95Cd',
-      port:     5432,
-      ssl:      { rejectUnauthorized: false },
-    });
-    await db.connect();
+    const header = req.headers.authorization || "";
+    const match = header.match(/^Bearer (.+)$/);
+    if (!match) return res.status(401).json({ error: "Missing auth header" });
+    const idToken = match[1];
 
     try {
-      const { rows } = await db.query(
-        `
-        SELECT
-          r.role                                   AS role,
-          u.email                                  AS email,
-          CONCAT_WS(' ',
-            COALESCE(up.first_name, ''),
-            COALESCE(up.middle_name, ''),
-            COALESCE(up.last_name, '')
-          )                                         AS "fullName"
-        FROM public."User"         AS u
-        JOIN public."Role"         AS r ON u.role_id    = r.role_id
-        JOIN public."User_Profile" AS up ON up.user_id   = u.user_id
+      const decoded = await admin.auth().verifyIdToken(idToken);
+      const uid = decoded.uid;
+
+      // Connect to DB
+      const db = new Client({
+        user: "neondb_owner",
+        host: "ep-old-wind-a1kkjbku-pooler.ap-southeast-1.aws.neon.tech",
+        database: "neondb",
+        password: "npg_mQOGqHwl95Cd",
+        port: 5432,
+        ssl: { rejectUnauthorized: false },
+      });
+
+      await db.connect();
+
+      const query = `
+        SELECT 
+          u.user_id,
+          u.email,
+          r.role,
+          ap.photo_url,
+          up.first_name,
+          up.last_name
+        FROM public."User" u
+        JOIN public."Role" r ON u.role_id = r.role_id
+        LEFT JOIN public."Alumni_Profiles" ap ON ap.user_id = u.user_id
+        LEFT JOIN public."User_Profile" up ON up.user_id = u.user_id
         WHERE u.user_id = $1
         LIMIT 1;
-        `,
-        [userId]
-      );
+      `;
 
-      if (rows.length === 0) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      return res.status(200).json(rows[0]);
-    } catch (err) {
-      console.error('getSidebarUser error:', err);
-      return res.status(500).json({ error: 'Internal server error' });
-    } finally {
+      const { rows } = await db.query(query, [uid]);
       await db.end();
+
+      if (!rows.length) return res.status(404).json({ error: "User not found" });
+
+      const { user_id, email, role, photo_url, first_name, last_name } = rows[0];
+      const fullName = [first_name, last_name].filter(Boolean).join(" ");
+
+      return res.json({ user_id, email, role, photo_url, fullName });
+    } catch (err) {
+      console.error("🔥 Error in getSidebarUser:", err.stack || err);
+      return res.status(401).json({ error: "Invalid token" });
     }
   });
 });

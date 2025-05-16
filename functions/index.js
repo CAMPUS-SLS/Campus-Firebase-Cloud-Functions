@@ -10,14 +10,7 @@
 
 
 //REGISTER APPLICANT HTTP
-const { registerApplicant } = require('./src/triggers/http/registerApplicant');
-const { loginStudent } = require('./src/triggers/http/loginStudent');
 
-//AUTH FOR STAFF
-const { loginStaff } = require("./src/triggers/http/loginStaff");
-const { registerStaff } = require("./src/triggers/http/registerStaff");
-const { verifyStaff } = require("./src/triggers/http/verifyStaff");
-const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVerification");
 
 
 const { submitDocumentRequest } = require('./src/triggers/http/submitDocumentRequest');
@@ -29,6 +22,8 @@ const { getSponsorPerks   } = require('./src/triggers/http/getSponsorPerks');
 const { getAlumniProfile } = require("./src/triggers/http/getAlumniProfile");
 const { loginAlumni } = require('./src/triggers/http/loginAlumni');
 const { getSidebarUser } = require('./src/triggers/http/getSidebarUser');
+const { verifyAlumni } = require("./src/triggers/http/verifyAlumni");
+const { submitAlumniCardApplication } = require("./src/triggers/http/submitAlumniCardApplication");
 
 
 // Export Auth Triggers
@@ -37,15 +32,7 @@ const { getSidebarUser } = require('./src/triggers/http/getSidebarUser');
 
 // Export HTTP Functions
 // exports.rickRoll = rickRollHTTP.rickRoll;
-exports.registerApplicant = registerApplicant;
-//exports.verifyReferenceNumber = require('./triggers/http/verifyReferenceNumber').verifyReferenceNumber;
-exports.loginStudent = loginStudent; 
 
-
-exports.loginStaff = loginStaff;
-exports.registerStaff = registerStaff;
-exports.verifyStaff = verifyStaff;
-exports.getAllStaffVerification = getAllStaffVerification;
 
 exports.getAlumniProfile = getAlumniProfile;
 
@@ -53,6 +40,8 @@ exports.submitDocumentRequest = submitDocumentRequest;
 exports.getColleges    = getColleges;
 exports.getDepartments = getDepartments;
 exports.loginAlumni = loginAlumni;
+exports.verifyAlumni = verifyAlumni;
+exports.submitAlumniCardApplication = submitAlumniCardApplication;
 
 
 exports.getSidebarUser = getSidebarUser;

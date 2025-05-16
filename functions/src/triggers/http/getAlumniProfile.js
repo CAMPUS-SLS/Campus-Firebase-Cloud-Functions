@@ -1,6 +1,9 @@
 const functions = require("firebase-functions");
 const cors = require("cors")({ origin: true });
+const admin = require("firebase-admin");
 const { Client } = require("pg");
+
+if (!admin.apps.length) admin.initializeApp();
 
 const getAlumniProfile = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
@@ -8,9 +11,20 @@ const getAlumniProfile = functions.https.onRequest((req, res) => {
       return res.status(405).json({ error: "Method Not Allowed" });
     }
 
-    const alumniId = req.query.alumniId;
-    if (!alumniId) {
-      return res.status(400).json({ error: "alumniId is required" });
+    // ✅ Extract Bearer token
+    const header = req.headers.authorization || "";
+    const match = header.match(/^Bearer (.+)$/);
+    if (!match) return res.status(401).json({ error: "Missing auth header" });
+
+    const idToken = match[1];
+
+    let uid;
+    try {
+      const decoded = await admin.auth().verifyIdToken(idToken);
+      uid = decoded.uid;
+    } catch (err) {
+      console.error("Token verification failed:", err);
+      return res.status(401).json({ error: "Invalid or expired token" });
     }
 
     const db = new Client({
@@ -61,8 +75,9 @@ const getAlumniProfile = functions.https.onRequest((req, res) => {
         FROM public."Alumni_Profiles" ap
         JOIN public."User_Profile" up ON ap.user_id = up.user_id
         JOIN public."Department" d ON ap.department_id = d.department_id
-        WHERE ap.alumni_profile_id = $1;
-      `, [alumniId]);
+        WHERE ap.user_id = $1
+        LIMIT 1;
+      `, [uid]);
 
       if (rows.length === 0) {
         return res.status(404).json({ error: "Alumni not found" });
@@ -73,9 +88,7 @@ const getAlumniProfile = functions.https.onRequest((req, res) => {
         result[key] = value;
       });
 
-      // Log after the result is populated
       console.log("Returned Alumni Profile Data:", result);
-
       return res.status(200).json(result);
     } catch (err) {
       console.error("Error fetching alumni profile:", err);
