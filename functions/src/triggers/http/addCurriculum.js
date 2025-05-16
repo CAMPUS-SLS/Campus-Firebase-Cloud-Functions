@@ -17,95 +17,68 @@ exports.addCurriculum = functions.https.onRequest(async (req, res) => {
       return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { curriculumName, departmentid, acadyear, acadterm, effectiveYear, newCourse, curriculumid } = req.body;
-
-    const id = "CURR"+ Date.now()
-    const alternateid = "CCF"+ Date.now()
-
-    let query
-
-    query = `
-      INSERT INTO "Curriculum"(curriculum_id, department_id, curriculum_name, acad_year, acad_term, effective_start_year, is_active)
-        VALUES ($1, $2, $3, $4, $5, $6, true);
-
-      UPDATE "Curriculum" 
-      SET is_active = 'false'
-      WHERE department_id = $2;
-
-    `; 
-
-    if(newCourse&&curriculumid){
-    query = `
-    INSERT INTO "Curriculum_Courses_Fact"(curr_course_id, curriculum_id, course_id, year_level,term)
-    VALUES ($1, $2, $3, $4, $5)
-    `
-    }
-
-    const sql = query
-
-    let selectedValues 
-
-    selectedValues = [
-      id,
-      departmentid, 
-      curriculumName,
-      acadyear, 
-      acadterm, 
-      effectiveYear,
-    ];
-
-    if(newCourse&&curriculumid){
-      selectedValues = [
-        alternateid,
-        curriculumid,
-        newCourse,
-        acadyear,
-        acadterm
-      ];
-    }
-
-    const values = selectedValues
-
     try {
-      const result = await pool.query(sql, values);
-      return res.status(201).json({ timeslot: result.rows[0] });
+      const { curriculumName, departmentid, acadyear, acadterm, effectiveYear, newCourse, curriculumid } = req.body;
+
+      // Validate required fields
+      if (!curriculumName || !departmentid || !acadyear || !acadterm || !effectiveYear) {
+        if (!(newCourse && curriculumid)) { // If not adding course case
+          return res.status(400).json({ error: 'Missing required fields' });
+        }
+      }
+
+      if (newCourse && curriculumid) {
+        // Add course to curriculum
+        const alternateid = "CCF"+ Date.now();
+        const result = await pool.query(
+          `INSERT INTO "Curriculum_Courses_Fact" 
+           (curr_course_id, curriculum_id, course_id, year_level, term)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING *`,
+          [alternateid, curriculumid, newCourse, acadyear, acadterm]
+        );
+        return res.status(201).json({ curriculumCourse: result.rows[0] });
+      } else {
+        // Create new curriculum (with transaction)
+        const client = await pool.connect();
+        try {
+          await client.query('BEGIN');
+          
+          const id = "CURR"+ Date.now();
+
+          // Deactivate other curricula in same department
+          await client.query(
+            `UPDATE "Curriculum" 
+             SET is_active = false
+             WHERE department_id = $1`,
+            [departmentid]
+          );
+
+          // Insert new active curriculum
+          const result = await client.query(
+            `INSERT INTO "Curriculum"
+             (curriculum_id, department_id, curriculum_name, 
+              acad_year, acad_term, effective_start_year, is_active)
+             VALUES ($1, $2, $3, $4, $5, $6, true)
+             RETURNING *`,
+            [id, departmentid, curriculumName, acadyear, acadterm, effectiveYear]
+          );
+
+          await client.query('COMMIT');
+          return res.status(201).json({ curriculum: result.rows[0] });
+        } catch (error) {
+          await client.query('ROLLBACK');
+          throw error;
+        } finally {
+          client.release();
+        }
+      }
     } catch (error) {
-      console.error('Database error:', error.message);
-      return res.status(500).json({ error: 'Internal server error' });
+      console.error('Error:', error);
+      return res.status(500).json({ 
+        error: 'Internal Server Error',
+        details: error.message 
+      });
     }
   });
 });
-
-/*
-FRONTEND CODE SAMPLE
-
-fetch("https://asia-southeast1-campus-student-lifecycle.cloudfunctions.net/addCurriculum", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    curriculumName: "Rizzlum", 
-    departmentid: "DEP001", 
-    acadyear: "Rizzler", 
-    acadterm: "Rizzler", 
-    effectiveYear: 2000
-  })
-})
-
-//ALTERNATE CODE TO ADD A COURSE TO A CURRICULUM
-
-fetch("https://asia-southeast1-campus-student-lifecycle.cloudfunctions.net/addCurriculum", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    curriculumid: "CURR001"
-    newCourse: "COURSE001", 
-    acadyear: 1, 
-    acadterm: "2nd Semester", 
-  })
-})
-
-*/
