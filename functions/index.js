@@ -11,6 +11,10 @@ const campusResultsFunctions = require('./src/triggers/http/admin/filters/Campus
 const { setAdminClaimFunction } = require('./src/triggers/http/admin/Set-Admin-Claim');
 const reservationAdminFunctions = require('./src/triggers/http/admin/filters/Reservation_View-ADMIN');
 const documentAdminFunctions = require('./src/triggers/http/admin/filters/Filter-Document_View-ADMIN');
+const { getAllPersonalInformation } = require('./src/triggers/http/admin/filters/Get-All-Personal-Information');
+const { registerApplicant } = require('./src/triggers/http/admin/filters/Register-Applicant');
+const { insertPersonalInfo } = require('./src/triggers/http/admin/filters/Insert-Personal-Info');
+const { insertParentGuardianInfo } = require('./src/triggers/http/admin/filters/Insert-Parent-Guardian-Info');
 
 // Initialize Firebase Admin
 admin.initializeApp();
@@ -29,6 +33,12 @@ exports.setAdminClaim = onCall({
     throw new onCall.HttpsError('internal', error.message || 'An error occurred while setting admin claim');
   }
 });
+
+// Application Information
+exports.getAllPersonalInformation = getAllPersonalInformation;
+exports.registerApplicant = registerApplicant;
+exports.insertPersonalInfo = insertPersonalInfo;
+exports.insertParentGuardianInfo = insertParentGuardianInfo;
 
 // Export Admission Functions from Reservation_View-ADMIN.js
 exports.getAdmissionApplicants = reservationAdminFunctions.getAdmissionApplicants;
