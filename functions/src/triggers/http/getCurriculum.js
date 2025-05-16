@@ -29,7 +29,7 @@ exports.getCurriculum = functions.https.onRequest(async (req, res) => {
         query = `SELECT * FROM "Curriculum_Courses_Fact" WHERE curriculum_id =$1
     `
     } else if(searchRoom){
-      query = `SELECT room_id FROM "Room" WHERE room_no =$1
+      query = `  SELECT room_id FROM "Room" WHERE CAST(room_no AS TEXT) = $1
 
       `
     } else if(searchProfessorByName) {
@@ -50,7 +50,7 @@ WHERE is_active = 'true'
     try {
 
         let chosenQuery
-        if(getCourses){
+        if(getCourses||searchRoom||searchProfessorByName){
         chosenQuery = await pool.query(sql, [info]);
         } else {
         chosenQuery = await pool.query(sql);

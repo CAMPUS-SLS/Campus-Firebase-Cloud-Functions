@@ -8,7 +8,7 @@
 // const rickRollAuthTriggers = require('./triggers/auth/rickRollAuthTrigger');
 // const rickRollHTTP = require('./triggers/http/rickRollCallable');
 
-
+/*
 //REGISTER APPLICANT HTTP
 const { registerApplicant } = require('./src/triggers/http/registerApplicant');
 const { loginStudent } = require('./src/triggers/http/loginStudent');
@@ -17,7 +17,7 @@ const { loginStudent } = require('./src/triggers/http/loginStudent');
 const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
 const { verifyStaff } = require("./src/triggers/http/verifyStaff");
-const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVerification");
+const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVerification"); */
 
 //Timeslot
 const { createTimeSlot } = require("./src/triggers/http/createTimeSlot");
@@ -33,7 +33,7 @@ const { getDropdownInfo } = require("./src/triggers/http/getDropdownInfo")
 // exports.logUserDeletedRickRoll = rickRollAuthTriggers.logUserDeletedRickRoll;
 
 // Export HTTP Functions
-// exports.rickRoll = rickRollHTTP.rickRoll;
+/* exports.rickRoll = rickRollHTTP.rickRoll;
 exports.registerApplicant = registerApplicant;
 //exports.verifyReferenceNumber = require('./triggers/http/verifyReferenceNumber').verifyReferenceNumber;
 exports.loginStudent = loginStudent; 
@@ -43,7 +43,7 @@ exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
 exports.verifyStaff = verifyStaff;
 exports.getAllStaffVerification = getAllStaffVerification;
-
+*/
 exports.createTimeSlot = createTimeSlot;
 exports.findSchedule = findSchedule;
 exports.getCurriculum = getCurriculum;
