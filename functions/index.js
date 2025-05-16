@@ -12,16 +12,17 @@
 //REGISTER APPLICANT HTTP
 const { registerApplicant } = require('./src/triggers/http/registerApplicant');
 const { loginStudent } = require('./src/triggers/http/loginStudent');
-const { insertPersonalInfo } = require('./src/triggers/http/insertPersonalInfo'); 
-const { insertAcademicBackground }  = require('./src/triggers/http/insertAcademicBackground');
-const { getAcademicBackground }  = require('./src/triggers/http/getAcademicBackground');
-const { insertParentGuardianInfo } = require('./src/triggers/http/insertParentGuardianInfo');
+// const { insertPersonalInfo } = require('./src/triggers/http/insertPersonalInfo'); 
+// const { insertAcademicBackground }  = require('./src/triggers/http/insertAcademicBackground');
+// const { getAcademicBackground }  = require('./src/triggers/http/getAcademicBackground');
+// const { insertParentGuardianInfo } = require('./src/triggers/http/insertParentGuardianInfo');
+
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
 const { verifyStaff } = require("./src/triggers/http/verifyStaff");
 const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVerification");
-const { generateStudentScheduleData } = require("./src/triggers/http/generateStudentScheduleData");
+// const { generateStudentScheduleData } = require("./src/triggers/http/generateStudentScheduleData");
 
 //EVALUATION
 const { saveEvaluationForm } = require("./src/triggers/http/saveEvaluationForm");
@@ -41,9 +42,9 @@ const { getEvaluationResponse } = require("./src/triggers/http/getEvaluationResp
 exports.registerApplicant = registerApplicant;
 //exports.verifyReferenceNumber = require('./triggers/http/verifyReferenceNumber').verifyReferenceNumber;
 exports.loginStudent = loginStudent; 
-exports.insertPersonalInfo = insertPersonalInfo; 
-exports.insertAcademicBackground   = insertAcademicBackground;
-exports.insertParentGuardianInfo = insertParentGuardianInfo;
+// exports.insertPersonalInfo = insertPersonalInfo; 
+// exports.insertAcademicBackground   = insertAcademicBackground;
+// exports.insertParentGuardianInfo = insertParentGuardianInfo;
 
 exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
@@ -53,9 +54,9 @@ exports.saveEvaluationForm = saveEvaluationForm;
 exports.getEvaluationForm = getEvaluationForm;
 exports.submitEvaluationResponse = submitEvaluationResponse;
 exports.getUniversityByAdmin = getUniversityByAdmin;
-exports.generateStudentScheduleData = generateStudentScheduleData;
+// exports.generateStudentScheduleData = generateStudentScheduleData;
 exports.getFacultyListForStudent = getFacultyListForStudent;
-exports.getAcademicBackground = getAcademicBackground;
+// exports.getAcademicBackground = getAcademicBackground;
 exports.exportStudentEvaluation = exportStudentEvaluation;
 exports.getEvaluationResponse = getEvaluationResponse;
 // You can add more functions as you develop them
