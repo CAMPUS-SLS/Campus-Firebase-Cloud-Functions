@@ -3,6 +3,7 @@
 const { Client } = require('pg');
 const { admin } = require('../../config/firebase');
 const functions = require('firebase-functions');
+const { ref } = require('firebase-functions/v1/database');
 const cors = require('cors')({ origin: true });
 require('dotenv').config(); // Load local .env variables
 
@@ -48,8 +49,8 @@ exports.registerApplicant = functions.https.onRequest((req, res) => {
 
       // 5. Insert into "User"
       await db.query(
-        `INSERT INTO "User" (user_id, role_id, email) VALUES ($1, $2, $3)`,
-        [uid, role_id, email]
+        `INSERT INTO "User" (user_id, role_id, email, password) VALUES ($1, $2, $3, $4)`,
+        [uid, role_id, email, referenceNumber]
       );
 
       // 6. Insert into "User_Profile"
