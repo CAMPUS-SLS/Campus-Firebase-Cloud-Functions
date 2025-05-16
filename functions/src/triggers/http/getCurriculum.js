@@ -17,7 +17,7 @@ exports.getCurriculum = functions.https.onRequest(async (req, res) => {
       return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { info, getCourses } = req.body;
+    const { info, getCourses, searchRoom, searchProfessorByName } = req.body;
 
     if (!info) {
       return res.status(400).json({ error: 'Missing values' });
@@ -28,6 +28,15 @@ exports.getCurriculum = functions.https.onRequest(async (req, res) => {
     if(getCourses){
         query = `SELECT * FROM "Curriculum_Courses_Fact" WHERE curriculum_id =$1
     `
+    } else if(searchRoom){
+      query = `SELECT room_id FROM "Room" WHERE room_no =$1
+
+      `
+    } else if(searchProfessorByName) {
+      query = `
+      SELECT professor_id FROM "Professor" a LEFT JOIN "User_Profile" b ON a.user_id = b.user_id
+      WHERE first_name || ' ' || last_name = $1
+      `
     } else {
         query = `SELECT d.*, curriculum_name, acad_year FROM "Department" d LEFT JOIN
 "Curriculum" e ON 
