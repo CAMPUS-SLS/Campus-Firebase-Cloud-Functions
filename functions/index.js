@@ -16,6 +16,10 @@ const { insertPersonalInfo } = require('./src/triggers/http/insertPersonalInfo')
 const { insertAcademicBackground }  = require('./src/triggers/http/insertAcademicBackground');
 const { getAcademicBackground }  = require('./src/triggers/http/getAcademicBackground');
 const { insertParentGuardianInfo } = require('./src/triggers/http/insertParentGuardianInfo');
+
+//APPLICANT INFORMATION
+const { getAllPersonalInformation } = require('./src/triggers/http/getAllPersonalInformation');
+
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
@@ -40,6 +44,7 @@ const { exportStudentEvaluation } = require("./src/triggers/http/exportStudentEv
 exports.registerApplicant = registerApplicant;
 //exports.verifyReferenceNumber = require('./triggers/http/verifyReferenceNumber').verifyReferenceNumber;
 exports.loginStudent = loginStudent; 
+exports.getAllPersonalInformation = getAllPersonalInformation;
 exports.insertPersonalInfo = insertPersonalInfo; 
 exports.insertAcademicBackground   = insertAcademicBackground;
 exports.insertParentGuardianInfo = insertParentGuardianInfo;
