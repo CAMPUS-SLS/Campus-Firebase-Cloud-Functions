@@ -29,6 +29,7 @@ exports.gradesRetriever = functions.https.onRequest(async (req, res) => {
           c.lab_units,
           g.acad_year || '_' || g.acad_term AS semesterId,
           g.grade,
+          g.grading_period_id,
           g.acad_year AS academicYear,
           g.acad_term AS term,
           co.college_name AS college,
