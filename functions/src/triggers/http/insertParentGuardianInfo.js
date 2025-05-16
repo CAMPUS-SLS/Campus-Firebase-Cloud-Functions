@@ -36,14 +36,25 @@ exports.insertParentGuardianInfo = functions.https.onRequest((req, res) => {
       });
       await db.connect();
 
-      // Check if user exists in Student_Applicant table
-      const applicantRes = await db.query(
-        `SELECT applicant_id FROM "Student_Applicant" WHERE user_id = $1 LIMIT 1`,
+      // First check if user exists in User table
+      const userRes = await db.query(
+        `SELECT user_id FROM "User" WHERE user_id = $1 LIMIT 1`,
         [uid]
       );
-      console.log("Student_Applicant record found:", applicantRes.rowCount > 0);
+      console.log("User record found:", userRes.rowCount > 0);
 
-      // 4. Get student_id for this user
+      if (userRes.rowCount === 0) {
+        await db.end();
+        return res.status(400).json({ 
+          message: 'User not found in database. Please complete registration first.',
+          details: {
+            hasUserRecord: false,
+            hasStudentRecord: false
+          }
+        });
+      }
+
+      // Then check if student record exists
       const studentRes = await db.query(
         `SELECT student_id FROM "Student" WHERE user_id = $1 LIMIT 1`,
         [uid]
@@ -51,26 +62,18 @@ exports.insertParentGuardianInfo = functions.https.onRequest((req, res) => {
       console.log("Student record found:", studentRes.rowCount > 0);
 
       if (studentRes.rowCount === 0) {
-        // Check if user exists in User table
-        const userRes = await db.query(
-          `SELECT user_id FROM "User" WHERE user_id = $1 LIMIT 1`,
-          [uid]
-        );
-        console.log("User record found:", userRes.rowCount > 0);
-
         await db.end();
         return res.status(400).json({ 
-          message: 'No Student record found for this user.',
+          message: 'No Student record found. Please complete student registration first.',
           details: {
-            hasUserRecord: userRes.rowCount > 0,
-            hasApplicantRecord: applicantRes.rowCount > 0,
+            hasUserRecord: true,
             hasStudentRecord: false
           }
         });
       }
       const student_id = studentRes.rows[0].student_id;
 
-      // 5. Create address records and get their IDs
+      // Create address records and get their IDs
       const fatherAddressId = `addr_${uuidv4().slice(0, 8)}`;
       const motherAddressId = `addr_${uuidv4().slice(0, 8)}`;
       const guardianAddressId = `addr_${uuidv4().slice(0, 8)}`;
@@ -93,7 +96,7 @@ exports.insertParentGuardianInfo = functions.https.onRequest((req, res) => {
         );
       }
 
-      // 6. Insert or update Parents
+      // Insert or update Parents
       let parents_id = `par_${student_id}`;
       await db.query(
         `INSERT INTO "Parents" (
@@ -120,7 +123,7 @@ exports.insertParentGuardianInfo = functions.https.onRequest((req, res) => {
         ]
       );
 
-      // 7. Insert or update Guardian (only if guardian info is provided)
+      // Insert or update Guardian (only if guardian info is provided)
       if (guardianName || guardianAddress || phoneHome || phoneWork) {
         let guardians_id = `gua_${student_id}`;
         await db.query(
@@ -144,7 +147,7 @@ exports.insertParentGuardianInfo = functions.https.onRequest((req, res) => {
         );
       }
 
-      // 8. Update household_income in Student_Applicant
+      // Update household_income in Student_Applicant
       await db.query(
         `UPDATE "Student_Applicant" SET household_income = $1 WHERE user_id = $2`,
         [householdIncome, uid]
