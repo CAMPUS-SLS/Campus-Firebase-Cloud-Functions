@@ -35,7 +35,7 @@ exports.submitEvaluationResponse = functions.https.onRequest((req, res) => {
         throw new Error(`No student found for user_id: ${userId}`);
       }
 
-      const studentId = studentRes.rows[0].student_id;
+      const { userId, evalFormId, profLoadId, answers } = req.body;
 
       // Check if there's already a pending track
       const trackRes = await db.query(

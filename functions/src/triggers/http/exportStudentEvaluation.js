@@ -2,7 +2,7 @@ const { Client } = require("pg");
 const functions = require("firebase-functions");
 const cors = require("cors")({ origin: true });
 
-exports.exportStudentEvaluations = functions.https.onRequest((req, res) => {
+exports.exportStudentEvaluation = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     const db = new Client({
       connectionString: process.env.DATABASE_URL,
