@@ -19,47 +19,42 @@ exports.getCurriculum = functions.https.onRequest(async (req, res) => {
 
     const { info, getCourses, searchRoom, searchProfessorByName } = req.body;
 
-    if (!info) {
+    if (!info && (getCourses || searchRoom || searchProfessorByName)) {
       return res.status(400).json({ error: 'Missing values' });
     }
 
-    let query
+    let query;
 
-    if(getCourses){
-        query = `SELECT * FROM "Curriculum_Courses_Fact" WHERE curriculum_id =$1
-    `
-    } else if(searchRoom){
-      query = `SELECT room_id FROM "Room" WHERE room_no =$1
-
-      `
-    } else if(searchProfessorByName) {
+    if (getCourses) {
+      query = `SELECT * FROM "Curriculum_Courses_Fact" WHERE curriculum_id = $1`;
+    } else if (searchRoom) {
+      query = `SELECT room_id FROM "Room" WHERE room_no = $1`;
+    } else if (searchProfessorByName) {
       query = `
-      SELECT professor_id FROM "Professor" a LEFT JOIN "User_Profile" b ON a.user_id = b.user_id
-      WHERE first_name || ' ' || last_name = $1
-      `
+        SELECT professor_id FROM "Professor" a 
+        LEFT JOIN "User_Profile" b ON a.user_id = b.user_id
+        WHERE first_name || ' ' || last_name = $1
+      `;
     } else {
-        query = `SELECT d.*, curriculum_name, acad_year FROM "Department" d LEFT JOIN
-"Curriculum" e ON 
-d.department_id = e.department_id
-WHERE is_active = 'true'
-    `
+      query = `
+        SELECT d.*, curriculum_name, acad_year 
+        FROM "Department" d 
+        LEFT JOIN "Curriculum" e ON d.department_id = e.department_id
+        WHERE is_active = 'true'
+      `;
     }
 
-    const sql = query;
-
     try {
+      console.log("Executing query with info:", info);
+      let chosenQuery;
 
-        let chosenQuery
-        if(getCourses){
-        chosenQuery = await pool.query(sql, [info]);
-        } else {
-        chosenQuery = await pool.query(sql);
-        }
+      if (getCourses || searchRoom || searchProfessorByName) {
+        chosenQuery = await pool.query(query, [info]);
+      } else {
+        chosenQuery = await pool.query(query);
+      }
 
-        const { rows } = chosenQuery
-
-
-      return res.status(200).json(rows);
+      return res.status(200).json(chosenQuery.rows);
     } catch (error) {
       console.error('Database error:', error.message);
       return res.status(500).json({ error: 'Internal server error' });
