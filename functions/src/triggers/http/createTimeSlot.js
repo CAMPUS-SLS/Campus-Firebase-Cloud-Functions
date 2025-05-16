@@ -1,15 +1,12 @@
 const functions = require("firebase-functions");
 const cors = require("cors")({ origin: true });
-const { Pool } = require("pg");
+const { Client } = require("pg");
 
-const pool = new Pool({
-  user: 'neondb_owner',
-  host: 'ep-old-wind-a1kkjbku-pooler.ap-southeast-1.aws.neon.tech',
-  database: 'neondb',
-  password: 'npg_mQOGqHwl95Cd',
-  port: 5432,
-  ssl: { rejectUnauthorized: false },
-});
+const pool = new Client({
+        connectionString:'postgresql://neondb_owner:npg_mQOGqHwl95Cd@ep-old-wind-a1kkjbku-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require',
+        ssl: { rejectUnauthorized: false }
+      });
+      await pool.connect();
 
 exports.createTimeSlot = functions.https.onRequest(async (req, res) => {
   cors(req, res, async () => {
