@@ -29,9 +29,10 @@ exports.getCurriculum = functions.https.onRequest(async (req, res) => {
         query = `SELECT * FROM "Curriculum_Courses_Fact" WHERE curriculum_id =$1
     `
     } else {
-        query = `SELECT "Curriculum".*, department_name FROM "Curriculum" LEFT JOIN "Department" 
-                ON
-                "Curriculum".department_id = "Department".department_id
+        query = `SELECT d.*, curriculum_name, acad_year FROM "Department" d LEFT JOIN
+"Curriculum" e ON 
+d.department_id = e.department_id
+WHERE is_active = 'true'
     `
     }
 
