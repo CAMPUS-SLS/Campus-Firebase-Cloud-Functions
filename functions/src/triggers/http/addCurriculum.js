@@ -26,7 +26,11 @@ exports.addCurriculum = functions.https.onRequest(async (req, res) => {
 
     query = `
       INSERT INTO "Curriculum"(curriculum_id, department_id, curriculum_name, acad_year, acad_term, effective_start_year, is_active)
-        VALUES ($1, $2, $3, $4, $5, $6, true) RETURNING *
+        VALUES ($1, $2, $3, $4, $5, $6, true);
+
+      UPDATE "Curriculum" 
+      SET is_active = 'false'
+      WHERE department_id = $2;
 
     `; 
 
