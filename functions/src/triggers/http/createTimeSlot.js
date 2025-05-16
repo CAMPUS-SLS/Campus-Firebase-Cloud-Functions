@@ -17,7 +17,7 @@ exports.createTimeSlot = functions.https.onRequest(async (req, res) => {
       return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { startTime, endTime, weekday, courseid, professorid, roomid, sectionid } = req.body;
+    const { startTime, endTime, weekday, courseid, professorid, roomid, sectionid, isLab } = req.body;
 
     if (!startTime || !endTime || !weekday || !courseid || !professorid || !roomid || !sectionid) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -26,8 +26,8 @@ exports.createTimeSlot = functions.https.onRequest(async (req, res) => {
     const id = "TS"+ Date.now()
 
     const sql = `
-      INSERT INTO "Timeslot"(timeslot_id, timeslot_start, timeslot_end, weekday, professor_id, course_id, section_id, room_id, is_available)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true) RETURNING *
+      INSERT INTO "Timeslot"(timeslot_id, timeslot_start, timeslot_end, weekday, professor_id, course_id, section_id, room_id, is_available, "isLab")
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, $9) RETURNING *
     `;
 
     const values = [
@@ -38,7 +38,8 @@ exports.createTimeSlot = functions.https.onRequest(async (req, res) => {
       professorid,
       courseid,
       sectionid,
-      roomid
+      roomid,
+      isLab
     ];
 
     try {
