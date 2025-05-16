@@ -61,14 +61,17 @@ fetch("https://asia-southeast1-campus-student-lifecycle.cloudfunctions.net/creat
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
-    startTime: "10:00:00",
+    startTime: "10:00:00", //MUST BE IN 24 HOUR FORMAT
     endTime: "12:00:00",
-    weekday: "Friday",
-    courseid: "COURSE001",
+    weekday: "Friday",  //MUST BE IN FULL FORMAT
+    courseid: "COURSE001", //IT MUST BE IDs 
     professorid: "P001",
     roomid: "RM001",
     sectionid: "SEC001"
+    isLab: false
   })
-})
+}).then(response => response.json())
+.then(data => console.log("Inputted into Database:", data))
+.catch(error => console.error("Error:", error));
 
 */
