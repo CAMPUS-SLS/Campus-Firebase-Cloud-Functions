@@ -30,6 +30,7 @@ const { submitEvaluationResponse } = require("./src/triggers/http/submitEvaluati
 const { getUniversityByAdmin } = require("./src/triggers/http/getUniversityByAdmin");
 const { getFacultyListForStudent } = require("./src/triggers/http/getFacultyListForStudent");
 const { exportStudentEvaluation } = require("./src/triggers/http/exportStudentEvaluation");
+const { getEvaluationResponse } = require("./src/triggers/http/getEvaluationResponse");
 
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
@@ -56,6 +57,7 @@ exports.generateStudentScheduleData = generateStudentScheduleData;
 exports.getFacultyListForStudent = getFacultyListForStudent;
 exports.getAcademicBackground = getAcademicBackground;
 exports.exportStudentEvaluation = exportStudentEvaluation;
+exports.getEvaluationResponse = getEvaluationResponse;
 // You can add more functions as you develop them
 // Example:
 // exports.anotherFunction = require('./path/to/file').functionName;
