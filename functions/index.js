@@ -9,9 +9,9 @@
 // const rickRollHTTP = require('./triggers/http/rickRollCallable');
 
 
-//REGISTER APPLICANT HTTP
+/*REGISTER APPLICANT HTTP
 const { registerApplicant } = require('./src/triggers/http/registerApplicant');
-const { loginStudent } = require('./src/triggers/http/loginStudent');
+const { loginStudent } = require('./src/triggers/http/loginStudent');*/
 
 //VerifyAdmin getAdminProfile
 const { verifyAdmin, updateAdminProfile } = require("./src/triggers/http/Login");
@@ -55,17 +55,17 @@ const { registerAdmin } = require("./src/triggers/http/registerAdmin");
 const { getFeedback } = require("./src/triggers/http/alumnifeedback");
 const { getFeedbackById } = require("./src/triggers/http/alumnifeedback");
 
-//AUTH FOR STAFF
+/*AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
 const { verifyStaff } = require("./src/triggers/http/verifyStaff");
-const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVerification");
+const { getAllStaffVerification } = require("./src/triggers/http/getAllStaffVerification"); */
 
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
 // exports.logUserDeletedRickRoll = rickRollAuthTriggers.logUserDeletedRickRoll;
 
-// Export HTTP Functions
+/* Export HTTP Functions
 // exports.rickRoll = rickRollHTTP.rickRoll;
 exports.registerApplicant = registerApplicant;
 //exports.verifyReferenceNumber = require('./triggers/http/verifyReferenceNumber').verifyReferenceNumber;
@@ -75,7 +75,7 @@ exports.loginStudent = loginStudent;
 exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
 exports.verifyStaff = verifyStaff;
-exports.getAllStaffVerification = getAllStaffVerification;
+exports.getAllStaffVerification = getAllStaffVerification; */
 
 exports.verifyAdmin = verifyAdmin;
 exports.getUserProfile = getUserProfile;
