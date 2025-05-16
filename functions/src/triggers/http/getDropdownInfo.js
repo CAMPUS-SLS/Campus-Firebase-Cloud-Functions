@@ -1,14 +1,9 @@
 const functions = require("firebase-functions");
 const cors = require("cors")({ origin: true });
 const { Client } = require("pg");
+require("dotenv").config();
 
- const pool = new Client({
-        connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false }
-      });
-      await pool.connect();
-
-
+ 
 exports.getDropdownInfo = functions.https.onRequest(async (req, res) => {
   cors(req, res, async () => {
     if (req.method !== 'POST') {
@@ -19,6 +14,11 @@ exports.getDropdownInfo = functions.https.onRequest(async (req, res) => {
 
     let query
     let params = [];
+
+    const pool = new Client({
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false }
+      });
 
     if( getDepartment ){
         query = `SELECT * FROM "Department"
@@ -85,7 +85,7 @@ LEFT JOIN (SELECT weekday, professor_id AS lab_professor_id, section_id, room_id
     const sql = query;
 
     try {
-
+        await pool.connect();
         let chosenQuery
         chosenQuery = await pool.query(sql, params);
         const { rows } = chosenQuery

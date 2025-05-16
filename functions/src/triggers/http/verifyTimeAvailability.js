@@ -1,13 +1,7 @@
 const functions = require("firebase-functions");
 const cors = require("cors")({ origin: true });
 const { Client } = require("pg");
-
- const pool = new Client({
-        connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false }
-      });
-      await pool.connect();
-
+require("dotenv").config();
 
 exports.verifyTimeAvailability = functions.https.onRequest(async (req, res) => {
   cors(req, res, async () => {
@@ -20,6 +14,11 @@ exports.verifyTimeAvailability = functions.https.onRequest(async (req, res) => {
     if (!startTime || !endTime || !weekday || !professorid || !roomid || !sectionid) {
       return res.status(400).json({ error: 'Missing values' });
     }
+
+    const pool = new Client({
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false }
+      });
 
     const sqlTimeslotSearch = `
       SELECT * FROM "Timeslot" 
@@ -41,6 +40,7 @@ exports.verifyTimeAvailability = functions.https.onRequest(async (req, res) => {
     `;
 
     try {
+      await pool.connect();
       const timeslotResult = await pool.query(sqlTimeslotSearch, [endTime, startTime, weekday, roomid, sectionid]);
       const roomResult = await pool.query(sqlRoomAvailabilitySearch, [startTime, endTime, weekday, roomid]);
       const professorResult = await pool.query(sqlProfessorAvailability, [startTime, endTime, weekday, professorid]);

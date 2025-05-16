@@ -1,13 +1,7 @@
 const functions = require("firebase-functions");
 const cors = require("cors")({ origin: true });
 const { Client } = require("pg");
-
- const pool = new Client({
-        connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false }
-      });
-      await pool.connect();
-
+require("dotenv").config();
 
 exports.findSchedule = functions.https.onRequest(async (req, res) => {
   cors(req, res, async () => {
@@ -20,6 +14,11 @@ exports.findSchedule = functions.https.onRequest(async (req, res) => {
     if (!info || !searchType) {
       return res.status(400).json({ error: 'Missing values' });
     }
+
+	const pool = new Client({
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false }
+      });
 
     let query
 
@@ -178,6 +177,7 @@ LEFT JOIN "Professor" b ON a.professor_id = b.professor_id
     const sql = query;
 
     try {
+	await pool.connect();
       const { rows } = await pool.query(sql, [info]);
       return res.status(200).json(rows);
     } catch (error) {

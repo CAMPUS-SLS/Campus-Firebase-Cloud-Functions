@@ -1,12 +1,7 @@
 const functions = require("firebase-functions");
 const cors = require("cors")({ origin: true });
 const { Client } = require("pg");
-
-const pool = new Client({
-        connectionString:'postgresql://neondb_owner:npg_mQOGqHwl95Cd@ep-old-wind-a1kkjbku-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require',
-        ssl: { rejectUnauthorized: false }
-      });
-      await pool.connect();
+require("dotenv").config();
 
 exports.createTimeSlot = functions.https.onRequest(async (req, res) => {
   cors(req, res, async () => {
@@ -20,6 +15,11 @@ exports.createTimeSlot = functions.https.onRequest(async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    const pool = new Client({
+        connectionString:process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false }
+      });
+      
     const id = "TS"+ Date.now()
 
     const sql = `
@@ -40,6 +40,7 @@ exports.createTimeSlot = functions.https.onRequest(async (req, res) => {
     ];
 
     try {
+      await pool.connect();
       const result = await pool.query(sql, values);
       return res.status(201).json({ timeslot: result.rows[0] });
     } catch (error) {

@@ -1,14 +1,7 @@
 const functions = require("firebase-functions");
 const cors = require("cors")({ origin: true });
 const { Client } = require("pg");
-
- const pool = new Client({
-        connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: false }
-      });
-      await pool.connect();
-
-
+require("dotenv").config();
 
 exports.getCurriculum = functions.https.onRequest(async (req, res) => {
   cors(req, res, async () => {
@@ -21,6 +14,11 @@ exports.getCurriculum = functions.https.onRequest(async (req, res) => {
     if (!info) {
       return res.status(400).json({ error: 'Missing values' });
     }
+
+    const pool = new Client({
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false }
+      });
 
     let query
 
@@ -47,7 +45,7 @@ WHERE is_active = 'true'
     const sql = query;
 
     try {
-
+        await pool.connect();
         let chosenQuery
         if(getCourses||searchRoom||searchProfessorByName){
         chosenQuery = await pool.query(sql, [info]);
