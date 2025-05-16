@@ -24,6 +24,8 @@ const { insertGradesForm } = require('./src/triggers/http/insertGradesForm');
 const { getGradesForm } = require('./src/triggers/http/getGradesForm');
 const { getStudentMLInputs } = require('./src/triggers/http/getStudentMLInputs');
 const { getAllStudentMLInputs } = require('./src/triggers/http/getAllStudentMLInputs');
+const { storePredictionResults } = require('./src/triggers/http/storePredictionResults');
+const { getAllProspectsWithPredictions } = require('./src/triggers/http/getAllProspectsWithPredictions');
 
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
@@ -58,6 +60,8 @@ exports.insertGradesForm = insertGradesForm;
 exports.getGradesForm = getGradesForm;
 exports.getStudentMLInputs = getStudentMLInputs;
 exports.getAllStudentMLInputs = getAllStudentMLInputs;
+exports.storePredictionResults = storePredictionResults;
+exports.getAllProspectsWithPredictions = getAllProspectsWithPredictions;
 
 exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
