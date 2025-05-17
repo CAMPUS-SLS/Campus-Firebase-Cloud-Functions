@@ -27,7 +27,7 @@ exports.verifyTimeAvailability = functions.https.onRequest(async (req, res) => {
       SELECT * FROM "Timeslot" 
       WHERE (timeslot_start < $1 AND timeslot_end > $2) 
       AND weekday = $3 
-      AND (room_id = $4 OR section_id = $5)
+      AND (room_id = $4 OR section_id = $5 OR professor_id =$6)
     `;
 
     const sqlRoomAvailabilitySearch = `
@@ -43,19 +43,16 @@ exports.verifyTimeAvailability = functions.https.onRequest(async (req, res) => {
     `;
 
     try {
-      const timeslotResult = await pool.query(sqlTimeslotSearch, [endTime, startTime, weekday, roomid, sectionid]);
-      const roomResult = await pool.query(sqlRoomAvailabilitySearch, [startTime, endTime, weekday, roomid]);
-      const professorResult = await pool.query(sqlProfessorAvailability, [startTime, endTime, weekday, professorid]);
+      const timeslotResult = await pool.query(sqlTimeslotSearch, [endTime, startTime, weekday, roomid, sectionid, professorid]);
+      //const roomResult = await pool.query(sqlRoomAvailabilitySearch, [startTime, endTime, weekday, roomid]);
+      //const professorResult = await pool.query(sqlProfessorAvailability, [startTime, endTime, weekday, professorid]);
 
       const emptyTimeslot = timeslotResult.rows.length === 0;
-      const roomOpen = roomResult.rows.length > 0;
-      const professorOpen = professorResult.rows.length > 0;
+      //const roomOpen = roomResult.rows.length > 0;
+      //const professorOpen = professorResult.rows.length > 0;
 
       return res.status(200).json({
-        available: emptyTimeslot && roomOpen && professorOpen,
-        emptyTimeslot,
-        roomOpen,
-        professorOpen
+        available: emptyTimeslot,
       });
     } catch (error) {
       console.error('Database error:', error.message);
