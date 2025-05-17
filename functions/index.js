@@ -28,6 +28,8 @@ const { verifyTimeAvailability } = require("./src/triggers/http/verifyTimeAvaila
 const { addCurriculum } = require("./src/triggers/http/addCurriculum")
 const { getDropdownInfo } = require("./src/triggers/http/getDropdownInfo")
 
+const { getTotalStudents } = require("./src/triggers/http/getTotalStudents")
+
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
 // exports.logUserDeletedRickRoll = rickRollAuthTriggers.logUserDeletedRickRoll;
@@ -51,6 +53,8 @@ exports.getProfessorInfo = getProfessorInfo;
 exports.verifyTimeAvailability = verifyTimeAvailability;
 exports.addCurriculum = addCurriculum;
 exports.getDropdownInfo = getDropdownInfo;
+
+exports.getTotalStudents = getTotalStudents;
 
 // You can add more functions as you develop them
 // Example:
