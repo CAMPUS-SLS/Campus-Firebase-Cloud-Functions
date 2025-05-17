@@ -114,7 +114,7 @@ exports.updateDocumentRequestStatus = functions.https.onRequest((req, res) => {
     try {
       await pool.query(
         `UPDATE "Document_Requests"
-         SET "status" = $1, "admin_comments" = $2
+         SET "status" = $1, "admin_notes" = $2
          WHERE "doc_request_id" = $3`,
         [new_status, comments, doc_request_id]
       );
