@@ -26,6 +26,8 @@ const { getStudentMLInputs } = require('./src/triggers/http/getStudentMLInputs')
 const { getAllStudentMLInputs } = require('./src/triggers/http/getAllStudentMLInputs');
 const { storePredictionResults } = require('./src/triggers/http/storePredictionResults');
 const { getAllProspectsWithPredictions } = require('./src/triggers/http/getAllProspectsWithPredictions');
+const { insertAlumniRelativeInfo } = require('./src/triggers/http/insertAlumniRelativeInfo');
+const { getAlumniRelativeInfo } = require('./src/triggers/http/getAlumniRelativeInfo');
 
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
@@ -62,6 +64,8 @@ exports.getStudentMLInputs = getStudentMLInputs;
 exports.getAllStudentMLInputs = getAllStudentMLInputs;
 exports.storePredictionResults = storePredictionResults;
 exports.getAllProspectsWithPredictions = getAllProspectsWithPredictions;
+exports.insertAlumniRelativeInfo = insertAlumniRelativeInfo;
+exports.getAlumniRelativeInfo = getAlumniRelativeInfo;
 
 exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
