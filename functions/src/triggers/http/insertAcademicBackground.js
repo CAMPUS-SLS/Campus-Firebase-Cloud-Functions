@@ -22,10 +22,10 @@ exports.insertAcademicBackground = functions.https.onRequest((req, res) => {
       const { uid } = await admin.auth().verifyIdToken(idToken);
 
       // 2. Parse + validate request body
-      const { gradeLevel, schoolName, completionYear, shsStrand } = req.body;
-      if (!gradeLevel || !schoolName || !completionYear) {
+      const { backgrounds } = req.body;
+      if (!Array.isArray(backgrounds) || backgrounds.length === 0) {
         return res.status(400).json({
-          message: 'gradeLevel, schoolName and completionYear are required'
+          message: 'backgrounds must be a non-empty array'
         });
       }
 
@@ -55,36 +55,52 @@ exports.insertAcademicBackground = functions.https.onRequest((req, res) => {
       }
       const userId = saRes.rows[0].user_id;
 
-      // 5. Generate a unique PK for this Academic_Background row
-      const rawId        = `ab_${uid.slice(0, 8)}_${Date.now()}`;
-      const academicBgId = rawId.length > 20 ? rawId.slice(0, 20) : rawId;
+      // 5. Process each background entry
+      for (const bg of backgrounds) {
+        const { gradeLevel, schoolName, completionYear, shsStrand } = bg;
 
-      // 6. Insert into Academic_Background
-      const insertSql = `
-        INSERT INTO "Academic_Background" (
-          academic_bg_id,
-          user_id,
-          grade_level,
-          school_name,
-          completion_year,
-          shs_strand
-        ) VALUES ($1, $2, $3, $4, $5, $6)
-      `;
-      await db.query(insertSql, [
-        academicBgId,
-        userId,
-        gradeLevel,
-        schoolName,
-        completionYear,
-        shsStrand || null
-      ]);
+        // validate bg fields
+        if (!gradeLevel || !schoolName || !completionYear) {
+          await db.end();
+          return res.status(400).json({
+            message: 'Each background must have gradeLevel, schoolName, and completionYear'
+          });
+        }
+
+        // generate academic_bg_id
+        const rawId        = `ab_${uid.slice(0, 8)}_${Date.now()}`;
+        const academicBgId = rawId.length > 20 ? rawId.slice(0, 20) : rawId;
+
+        // upsert into Academic_Background
+        const upsertSql = `
+          INSERT INTO "Academic_Background" (
+            academic_bg_id,
+            user_id,
+            grade_level,
+            school_name,
+            completion_year,
+            shs_strand
+          ) VALUES ($1, $2, $3, $4, $5, $6)
+          ON CONFLICT (user_id, grade_level) DO UPDATE SET
+            school_name = EXCLUDED.school_name,
+            completion_year = EXCLUDED.completion_year,
+            shs_strand = EXCLUDED.shs_strand
+        `;
+        await db.query(upsertSql, [
+          academicBgId,
+          userId,
+          gradeLevel,
+          schoolName,
+          completionYear,
+          shsStrand || null
+        ]);
+      }
 
       await db.end();
 
-      // 7. Return the new ID
+      // 6. Return success message
       return res.status(200).json({
-        message: 'Academic background saved',
-        academicBgId
+        message: 'Academic backgrounds saved'
       });
     } catch (err) {
       console.error('Error in insertAcademicBackground:', err);

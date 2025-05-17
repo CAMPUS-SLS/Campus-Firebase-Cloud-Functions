@@ -28,6 +28,10 @@ const { storePredictionResults } = require('./src/triggers/http/storePredictionR
 const { getAllProspectsWithPredictions } = require('./src/triggers/http/getAllProspectsWithPredictions');
 const { insertAlumniRelativeInfo } = require('./src/triggers/http/insertAlumniRelativeInfo');
 const { getAlumniRelativeInfo } = require('./src/triggers/http/getAlumniRelativeInfo');
+const { insertProgramPreferences } = require('./src/triggers/http/insertProgramPreferences');
+const { getProgramPreferences } = require('./src/triggers/http/getProgramPreferences');
+const { getApplicantAcademicBackground } = require('./src/triggers/http/getApplicantAcademicBackground');
+
 
 //AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
@@ -66,6 +70,10 @@ exports.storePredictionResults = storePredictionResults;
 exports.getAllProspectsWithPredictions = getAllProspectsWithPredictions;
 exports.insertAlumniRelativeInfo = insertAlumniRelativeInfo;
 exports.getAlumniRelativeInfo = getAlumniRelativeInfo;
+exports.insertProgramPreferences = insertProgramPreferences;
+exports.getProgramPreferences = getProgramPreferences;
+exports.getApplicantAcademicBackground = getApplicantAcademicBackground;
+
 
 exports.loginStaff = loginStaff;
 exports.registerStaff = registerStaff;
