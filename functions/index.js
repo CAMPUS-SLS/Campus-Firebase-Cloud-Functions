@@ -41,6 +41,13 @@ const { addAnnouncementCategory } = require("./src/triggers/http/announcements")
 const { updateAnnouncement } = require("./src/triggers/http/announcements");
 const { archiveAnnouncement } = require("./src/triggers/http/announcements");
 
+
+const { getAlumniEvents } = require('./src/triggers/http/getAlumniEvents');
+const { addAlumniEvents } = require('./src/triggers/http/events');
+const { updateAlumniEvents } = require('./src/triggers/http/events');
+const { deleteAlumniEvents } = require('./src/triggers/http/events');
+
+
 //DocumentRequest
 const {
   getDocumentRequests,
@@ -112,6 +119,12 @@ exports.getFeedbackById = getFeedbackById;
 
 exports.saveTestPhotoUrl = saveTestPhotoUrl;
 exports.registerAdmin = registerAdmin;
+
+exports.getAlumniEvents = getAlumniEvents;
+exports.addAlumniEvents = addAlumniEvents;
+exports.deleteAlumniEvents = deleteAlumniEvents;
+exports.updateAlumniEvents = updateAlumniEvents
+
 // You can add more functions as you develop them
 // Example:
 // exports.anotherFunction = require('./path/to/file').functionName;
