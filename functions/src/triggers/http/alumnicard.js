@@ -14,7 +14,9 @@ const pool = new Pool({
 });
 
 // ✅ GET detail of one alumni card application
-exports.getAlumniCardApplicationDetail = functions.https.onRequest((req, res) => {
+exports.getAlumniCardApplicationDetail = functions
+  .region("asia-southeast1")
+  .https.onRequest((req, res) => {
   cors(req, res, async () => {
     const { alumni_card_application_id } = req.query;
 
