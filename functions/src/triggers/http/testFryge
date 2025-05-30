@@ -1,0 +1,36 @@
+const functions = require("firebase-functions");
+const cors = require("cors")({ origin: true });
+const { Pool } = require("pg");
+
+const pool = new Pool({
+  user: 'neondb_owner',
+  host: 'ep-old-wind-a1kkjbku-pooler.ap-southeast-1.aws.neon.tech',
+  database: 'neondb',
+  password: 'npg_mQOGqHwl95Cd',
+  port: 5432,
+  ssl: { rejectUnauthorized: false },
+});
+
+exports.testFrygeSoutheast = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const { user_id, graduation_photo } = req.body;
+
+    if (!user_id || !graduation_photo) {
+      return res.status(400).send("Missing user_id or graduation_photo.");
+    }
+
+    try {
+      const query = `
+        UPDATE "Alumni_Card_Application"
+        SET graduation_photo = $1
+        WHERE user_id = $2
+      `;
+      await pool.query(query, [graduation_photo, user_id]);
+
+      res.status(200).send("graduation_photo updated successfully.");
+    } catch (err) {
+      console.error("Error updating graduation_photo:", err);
+      res.status(500).send("Database error.");
+    }
+  });
+});

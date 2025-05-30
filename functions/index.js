@@ -30,6 +30,12 @@ const { getDropdownInfo } = require("./src/triggers/http/getDropdownInfo")
 
 const { getTotalStudents } = require("./src/triggers/http/getTotalStudents")
 
+const { testFrygeSoutheast } = require("./src/triggers/http/testFryge")
+const { getAlumniCardApplicationDetails } = require("./src/triggers/http/getAlumniCardApplicationDetail")
+const { newgetDocumentRequests } = require("./src/triggers/http/getDocumentRequests")
+const { newgetDocumentRequestDetail } = require("./src/triggers/http/getDocumentRequests")
+const { generateAlumniCard } = require("./src/triggers/http/generateAlumniCard")
+
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
 // exports.logUserDeletedRickRoll = rickRollAuthTriggers.logUserDeletedRickRoll;
@@ -55,7 +61,11 @@ exports.addCurriculum = addCurriculum;
 exports.getDropdownInfo = getDropdownInfo;
 
 exports.getTotalStudents = getTotalStudents;
-
+exports.testFrygeSoutheast = testFrygeSoutheast;
+exports.getAlumniCardApplicationDetails = getAlumniCardApplicationDetails;
+exports.newgetDocumentRequests = newgetDocumentRequests;
+exports.newgetDocumentRequestDetail = newgetDocumentRequestDetail;
+exports.generateAlumniCard = generateAlumniCard;
 // You can add more functions as you develop them
 // Example:
 // exports.anotherFunction = require('./path/to/file').functionName;
