@@ -34,7 +34,7 @@ const { getTotalStudents } = require("./src/triggers/http/getTotalStudents")
 
 
 const { updateAlumniProfile } = require("./src/triggers/http/updateAlumniProfile");
-const { testUploadFunction } = require("./src/triggers/http/testUploadFunction");
+const { manageAlumniCardApplication } = require("./src/triggers/http/manageAlumniCardApplication");
 
 
 // Export Auth Triggers
@@ -68,7 +68,7 @@ exports.getTotalStudents = getTotalStudents;
 
 
 exports.updateAlumniProfile = updateAlumniProfile;
-exports.testUploadFunction = testUploadFunction;
+exports.manageAlumniCardApplication = manageAlumniCardApplication;
 
 
 
