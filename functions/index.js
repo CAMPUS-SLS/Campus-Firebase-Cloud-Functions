@@ -25,6 +25,11 @@ const { getAllBooks } = require('./src/triggers/http/getAllBooks');
 const { addSavedBooks } = require('./src/triggers/http/addSavedBooks');
 const { removeSavedBooks } = require('./src/triggers/http/removeSavedBooks');
 const { getAllSavedBooks } = require('./src/triggers/http/getAllSavedBooks');
+const { getAllBooksAdmin } = require('./src/triggers/http/getAllBooksAdmin');
+const { addBook } = require('./src/triggers/http/addBook');
+const { deleteBook } = require('./src/triggers/http/deleteBook');
+const { updateBook } = require('./src/triggers/http/updateBook');
+const { getStudentCourses } = require('./src/triggers/http/getStudentCourses');
 
 // Export Auth Triggers
 // exports.logNewUserRickRoll = rickRollAuthTriggers.logNewUserRickRoll;
@@ -44,10 +49,15 @@ exports.getAllStaffVerification = getAllStaffVerification;
 exports.generateStudentScheduleData = generateStudentScheduleData;
 
 //FOR LIBRARY
-exports.getAllbooks = getAllBooks;
+exports.getAllBooks = getAllBooks;
 exports.addSavedBooks = addSavedBooks;
 exports.removeSavedBooks = removeSavedBooks;
 exports.getAllSavedBooks = getAllSavedBooks;
+exports.getAllBooksAdmin = getAllBooksAdmin;
+exports.addBook = addBook;
+exports.deleteBook = deleteBook;
+exports.updateBook = updateBook;
+exports.getStudentCourses = getStudentCourses;
 
 // You can add more functions as you develop them
 // Example:
