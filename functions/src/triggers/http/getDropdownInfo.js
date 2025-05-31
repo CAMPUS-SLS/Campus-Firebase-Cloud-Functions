@@ -23,7 +23,13 @@ exports.getDropdownInfo = functions.https.onRequest(async (req, res) => {
     let params = [];
 
     if( getDepartment ){
-        query = `SELECT * FROM "Department"
+        query = `SELECT DISTINCT b.department_id, department_name, required_credits, minimum_gwa 
+FROM "Department" as e 
+INNER JOIN (
+SELECT grad.department_id, required_credits, minimum_gwa, "is_active" FROM "Curriculum" AS curr 
+LEFT JOIN "Graduation_Requirement" AS grad ON grad.department_id = curr.department_id
+WHERE "is_active" = 'true') 
+as b ON e.department_id = b.department_id;
     `
     } else if( getSection ) {
         query = `SELECT *,

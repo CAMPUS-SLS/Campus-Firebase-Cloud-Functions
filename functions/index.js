@@ -30,6 +30,8 @@ const { getDropdownInfo } = require("./src/triggers/http/getDropdownInfo")
 
 const { getTotalStudents } = require("./src/triggers/http/getTotalStudents")
 
+const { getDocumentsAccordingToDepartment } = require("./src/triggers/http/getDocumentsAccordingToDepartment")
+
 
 
 
@@ -62,6 +64,8 @@ exports.addCurriculum = addCurriculum;
 exports.getDropdownInfo = getDropdownInfo;
 
 exports.getTotalStudents = getTotalStudents;
+
+exports.getDocumentsAccordingToDepartment = getDocumentsAccordingToDepartment;
 
 
 

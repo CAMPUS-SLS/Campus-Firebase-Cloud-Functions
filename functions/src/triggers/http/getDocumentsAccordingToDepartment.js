@@ -1,0 +1,52 @@
+const functions = require("firebase-functions");
+const cors = require("cors")({ origin: true });
+const { Pool } = require("pg");
+
+const pool = new Pool({
+  user: 'neondb_owner',
+  host: 'ep-old-wind-a1kkjbku-pooler.ap-southeast-1.aws.neon.tech',
+  database: 'neondb',
+  password: 'npg_mQOGqHwl95Cd',
+  port: 5432,
+  ssl: { rejectUnauthorized: false },
+});
+
+exports.getDocumentsAccordingToDepartment = functions.https.onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method Not Allowed' });
+    }
+
+    const {info} = req.body;
+
+    const query = `SELECT DISTINCT document_name FROM "Graduation_Document" WHERE department_id = $1`
+
+    const sql = query;
+
+    try {
+        chosenQuery = await pool.query(sql, [info]);
+        const { rows } = chosenQuery
+      return res.status(200).json(rows);
+    } catch (error) {
+      console.error('Database error:', error.message);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+});
+
+/*
+
+fetch("https://asia-southeast1-campus-student-lifecycle.cloudfunctions.net/getDocumentsAccordingToDepartment", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+   info: // 
+  })
+})
+.then(response => response.json())
+.then(data => console.log("Response:", data))
+.catch(error => console.error("Error:", error));
+
+*/
