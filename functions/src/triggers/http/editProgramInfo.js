@@ -17,20 +17,30 @@ exports.getDocumentsAccordingToDepartment = functions.https.onRequest(async (req
       return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const {departmentid, newCredits, newGwa} = req.body;
+    const { departmentid, newCredits, newGwa, documents } = req.body;
 
-    const query = `
-    UPDATE "Graduation_Requirement"
-    SET required_credits = $1, minimum_gwa = $2, ...
-    WHERE department_id = $3;
-    
-    `
-    const sql = query;
+    const updateQuery = `
+      UPDATE "Graduation_Requirement"
+      SET required_credits = $1, minimum_gwa = $2
+      WHERE department_id = $3
+      RETURNING *;
+    `;
+
+    const deleteQuery = `
+      DELETE FROM "Graduation_Document"
+      WHERE department_id = $1 AND document_name NOT IN (${documents.map((_, i) => `$${i + 2}`).join(', ')});
+    `;
 
     try {
-        chosenQuery = await pool.query(sql, [newCredits, newGwa, departmentid]);
-        const { rows } = chosenQuery
-      return res.status(200).json(rows);
+      const updatedRequirement = await pool.query(updateQuery, [newCredits, newGwa, departmentid]);
+
+      const deleteParams = [departmentid, ...documents];
+      const deletedDocuments = await pool.query(deleteQuery, deleteParams);
+
+      return res.status(200).json({
+        updatedRequirement: updatedRequirement.rows,
+        deletedDocumentsCount: deletedDocuments.rowCount
+      });
     } catch (error) {
       console.error('Database error:', error.message);
       return res.status(500).json({ error: 'Internal server error' });
