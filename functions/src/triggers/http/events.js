@@ -11,78 +11,6 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-// ✅ GET Events - Only name, description, and status
-exports.getAlumniEvents = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    try {
-      const result = await pool.query(`
-        SELECT event_id, event_name AS "eventTitle", event_desc AS "eventDescription", event_status AS "eventStatus"
-        FROM "Events" WHERE event_type = 'Alumni'
-      `);
-
-      const events = result.rows.map(row => ({
-        id: row.event_id,
-        name: row.eventTitle,
-        description: row.eventDescription,
-        status: row.eventStatus
-      }));
-
-      return res.status(200).json(events);
-    } catch (err) {
-      console.error("Error fetching events:", err);
-      return res.status(500).json({ error: "Internal server error" });
-    }
-  });
-});
-
-// ✅ POST Event - Create a new event
-exports.addAlumniEvents = functions.https.onRequest((req, res) => {
-  return cors(req, res, async () => {
-        if (req.method !== "POST") {
-        return res.status(405).send("Method Not Allowed");
-        }
-
-    const { name, description, status } = req.body;
-
-    if (!name || !description || !status) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    try {
-      // GetAlum last event ID
-      const result = await pool.query(
-        `SELECT event_id FROM "Events"`
-      );
-
-      let newId;
-      if (result.rows.length === 0) {
-        newId = "EVNT001";
-      } else {
-        const lastId = result.rows[0].event_id; // e.g. 'EVNT004'
-        const numeric = parseInt(lastId.replace("EVNT", ""), 10) + 1;
-        newId = `EVNT${numeric.toString().padStart(3, "0")}`;
-      }
-
-      // Insert new event
-      const insert = await pool.query(
-        `INSERT INTO "Events" (event_id, event_name, event_desc, event_status, event_type)
-         VALUES ($1, $2, $3, $4, $5)
-         RETURNING *`,
-        [newId, name, description, status, 'Alumni']
-      );
-
-      res.status(201).json({
-        message: "Event added successfully",
-        event: insert.rows[0]
-      });
-    } catch (err) {
-      console.error("❌ Error creating event:", err);
-      res.status(500).send("Internal server error");
-    }
-  });
-});
-
-
 // ✅ PUT Event - Update an existing event
 exports.updateAlumniEvents = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
@@ -112,28 +40,46 @@ exports.updateAlumniEvents = functions.https.onRequest((req, res) => {
   });
 });
 
-// ✅ DELETE Event - Delete an existing event
-exports.deleteAlumniEvents = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    const eventId = req.query.id;
-    
-    if (!eventId) {
-      return res.status(400).json({ error: "Missing event ID" });
+
+exports.createEvents = functions.https.onRequest((req, res) => {
+  return cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
+
+    const { title , description, startDate, endDate, startTime, endTime, location, status } = req.body;
+    if (!title || !description || !startDate || !endDate || !startTime || !endTime || !location || !status) {
+      return res.status(400).send("Missing required fields.");
     }
 
     try {
-      // Delete the event
-      await pool.query(
-        `DELETE FROM "Events" WHERE event_id = $1`, 
-        [eventId]
+      // 1. Get the latest event_id
+      const result = await pool.query(
+        `SELECT event_id FROM "Events" ORDER BY event_id DESC LIMIT 1`
       );
 
-      return res.status(200).json({ 
-        message: "Event deleted successfully" 
-      });
+      let newId;
+      if (result.rows.length === 0) {
+        newId = "EVNT001";
+      } else {
+        const lastId = result.rows[0].event_id; // e.g. 'ANN004'
+        const numeric = parseInt(lastId.replace("EVNT", ""), 10) + 1;
+        newId = `EVNT${numeric.toString().padStart(3, "0")}`;
+      }
+
+      // 2. Insert new row
+      const insert = await pool.query(
+        `INSERT INTO "Events" 
+          (event_id, user_id, event_name, event_desc, start_date, end_date, start_time, end_time, venue, event_status, event_type)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'Alumni')
+          RETURNING *`,
+                [newId, 'U005', title, description, startDate, endDate, startTime, endTime, location, status]
+              );      
+
+      res.status(201).json(insert.rows[0]);
     } catch (err) {
-      console.error("Error deleting event:", err);
-      return res.status(500).json({ error: "Internal server error" });
+      console.error("❌ Error creating event:", err);
+      res.status(500).send("Internal server error");
     }
   });
 });

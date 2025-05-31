@@ -55,6 +55,8 @@ const { registerAdmin } = require("./src/triggers/http/registerAdmin");
 const { getFeedback } = require("./src/triggers/http/alumnifeedback");
 const { getFeedbackById } = require("./src/triggers/http/alumnifeedback");
 
+const { createEvents } = require("./src/triggers/http/events");
+
 /*AUTH FOR STAFF
 const { loginStaff } = require("./src/triggers/http/loginStaff");
 const { registerStaff } = require("./src/triggers/http/registerStaff");
@@ -112,6 +114,8 @@ exports.getFeedbackById = getFeedbackById;
 
 exports.saveTestPhotoUrl = saveTestPhotoUrl;
 exports.registerAdmin = registerAdmin;
+
+exports.createEvents = createEvents;
 // You can add more functions as you develop them
 // Example:
 // exports.anotherFunction = require('./path/to/file').functionName;

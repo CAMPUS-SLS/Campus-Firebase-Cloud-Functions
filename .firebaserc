@@ -1,7 +1,8 @@
 {
   "projects": {
     "campus-ar-adm": "campus-student-lifecycle",
-    "Alumnirel-ADM": "campus-student-lifecycle"
+    "Alumnirel-ADM": "campus-student-lifecycle",
+    "campus": "campus-student-lifecycle"
   },
   "targets": {},
   "etags": {}
